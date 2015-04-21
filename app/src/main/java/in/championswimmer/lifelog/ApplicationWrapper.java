@@ -11,6 +11,6 @@ public class ApplicationWrapper extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        LifeLog.initialise("5tAGGgWgda3fgIBAn6PGXm7SnmOhjAfv", "t0WZH49DUvQrbYGP");
+        LifeLog.initialise("5tAGGgWgda3fgIBAn6PGXm7SnmOhjAfv", "t0WZH49DUvQrbYGP", "https://tosc.in/championswimmer");
     }
 }

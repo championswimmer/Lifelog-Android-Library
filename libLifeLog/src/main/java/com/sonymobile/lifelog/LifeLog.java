@@ -21,6 +21,7 @@ public class LifeLog {
     static String client_id = "";
     static String client_secret = "";
     static String login_scope = "";
+    static String callback_url = "";
 
     public static String getClient_id() {
         return client_id;
@@ -30,9 +31,14 @@ public class LifeLog {
         return client_secret;
     }
 
-    public static void initialise (String id, String secret) {
+    public static String getCallback_url() {
+        return callback_url;
+    }
+
+    public static void initialise (String id, String secret, String callbackUrl) {
         client_id = id;
         client_secret = secret;
+        callback_url = callbackUrl;
         setScope(Scopes.PROFILE_READ, Scopes.ACTIVITIES_READ, Scopes.LOCATIONS_READ);
     }
 
