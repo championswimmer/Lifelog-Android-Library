@@ -10,7 +10,9 @@ import com.sonymobile.lifelog.login.LoginActivity;
  */
 public class LifeLog {
 
-    public static final int LOGIN_REQUEST_CODE = 2231;
+    public static final int LOGINACTIVITY_REQUEST_CODE = 2231;
+
+    public static final String LIFELOG_PREFS = "lifelog_prefs";
 
     public static class Scopes {
         public static final String PROFILE_READ = "lifelog.profile.read";
@@ -35,16 +37,16 @@ public class LifeLog {
         return callback_url;
     }
 
-    public static void initialise (String id, String secret, String callbackUrl) {
+    public static void initialise(String id, String secret, String callbackUrl) {
         client_id = id;
         client_secret = secret;
         callback_url = callbackUrl;
         setScope(Scopes.PROFILE_READ, Scopes.ACTIVITIES_READ, Scopes.LOCATIONS_READ);
     }
 
-    public static void setScope (String... scopes){
+    public static void setScope(String... scopes) {
         login_scope = "";
-        for (String scope : scopes){
+        for (String scope : scopes) {
             login_scope += "+" + scope;
         }
     }
@@ -53,9 +55,9 @@ public class LifeLog {
         return login_scope;
     }
 
-    public static boolean doLogin (Activity activity) {
+    public static boolean doLogin(Activity activity) {
         Intent loginIntent = new Intent(activity, LoginActivity.class);
-        activity.startActivityForResult(loginIntent, LOGIN_REQUEST_CODE);
+        activity.startActivityForResult(loginIntent, LOGINACTIVITY_REQUEST_CODE);
         return true; //TODO: return success of login
     }
 }
