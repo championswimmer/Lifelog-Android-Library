@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -15,6 +16,11 @@ import com.sonymobile.lifelog.utils.SecurePreferences;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by championswimmer on 21/4/15.
@@ -45,10 +51,10 @@ public class GetAuthTokenTask {
     public static final String AUTH_EXPIRES_IN = "expires_in";
     public static final String AUTH_REFRESH_TOKEN = "refresh_token";
 
-    protected void getAuth(String authCode, OnAuthenticatedListener oal) {
+    protected void getAuth(final String authCode, OnAuthenticatedListener oal) {
         onAuthenticatedListener = oal;
 
-        String authRequestBody =
+        final String authRequestBody =
                 PARAM_CLIENT_ID + "=" + LifeLog.getClient_id() + "&"
                         + PARAM_CLIENT_SECRET + "=" + LifeLog.getClient_secret() + "&"
                         + PARAM_GRANT_TYPE + "=" + "authorization_code" + "&"
@@ -85,7 +91,12 @@ public class GetAuthTokenTask {
 
                     }
                 }
-        );
+        ) {
+            @Override
+            public String getBodyContentType() {
+                return String.format("application/x-www-form-urlencoded; charset=%s", new Object[]{"utf-8"});
+            }
+        };
         loginQueue.add(authRequest);
     }
 
