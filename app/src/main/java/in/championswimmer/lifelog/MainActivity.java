@@ -3,6 +3,7 @@ package in.championswimmer.lifelog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -10,9 +11,14 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.sonymobile.lifelog.LifeLog;
+import com.sonymobile.lifelog.api.LifeLogLocationAPI;
+
+import java.util.ArrayList;
 
 
 public class MainActivity extends ActionBarActivity {
+
+    public static final String TAG = "LifeLog:MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,9 +33,23 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        boolean auth = LifeLog.isAuthenticated(this);
-        if (auth)
-            Toast.makeText(this, "authed", Toast.LENGTH_SHORT).show();
+        LifeLog.checkAuthentication(this, new LifeLog.OnAuthenticationChecked() {
+            @Override
+            public void onAuthChecked(boolean authenticated) {
+                if (authenticated) {
+                    Toast.makeText(MainActivity.this, "authed", Toast.LENGTH_SHORT).show();
+                    LifeLogLocationAPI llLocation = LifeLogLocationAPI.prepareRequest(10);
+                    llLocation.get(MainActivity.this, new LifeLogLocationAPI.OnLocationFetched() {
+                        @Override
+                        public void onLocationFetched(ArrayList<LifeLogLocationAPI.LifeLogLocation> locations) {
+                            Log.d(TAG, locations.get(0).getId());
+                        }
+                    });
+                } else {
+                    //LifeLog.doLogin(MainActivity.this);
+                }
+            }
+        });
     }
 
     @Override

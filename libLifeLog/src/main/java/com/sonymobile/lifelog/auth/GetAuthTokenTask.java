@@ -63,7 +63,7 @@ public class GetAuthTokenTask {
                             Log.d(TAG, jObj.getString(AUTH_EXPIRES));
                             Log.d(TAG, jObj.getString(AUTH_REFRESH_TOKEN));
                             if (onAuthenticatedListener != null) {
-                                onAuthenticatedListener.onAuthenticated();
+                                onAuthenticatedListener.onAuthenticated(jObj.getString(AUTH_ACCESS_TOKEN));
                             }
                         } catch (JSONException e) {
                             //TODO: handle malformed json
@@ -87,7 +87,7 @@ public class GetAuthTokenTask {
     }
 
     public interface OnAuthenticatedListener {
-        void onAuthenticated();
+        void onAuthenticated(String auth_token);
     }
 
 

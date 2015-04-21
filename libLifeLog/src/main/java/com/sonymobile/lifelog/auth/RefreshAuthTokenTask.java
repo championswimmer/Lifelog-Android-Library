@@ -19,7 +19,7 @@ import org.json.JSONObject;
  */
 public class RefreshAuthTokenTask {
 
-    public static final String TAG = "LifeLog:GetAuthToken";
+    public static final String TAG = "LifeLog:RefreshAuth";
     public static final String OAUTH2_URL = "https://platform.lifelog.sonymobile.com/oauth/2/refresh_token";
     public static final String AUTH_ACCESS_TOKEN = "access_token";
     public static final String AUTH_ISSUED_AT = "issued_at";
@@ -41,15 +41,17 @@ public class RefreshAuthTokenTask {
         final SecurePreferences spref = new SecurePreferences(mContext,
                 LifeLog.LIFELOG_PREFS, LifeLog.getClient_secret(), true);
 
-        final String authRequestBody =
+        final String refreshAuthBody =
                 PARAM_CLIENT_ID + "=" + LifeLog.getClient_id() + "&"
                         + PARAM_CLIENT_SECRET + "=" + LifeLog.getClient_secret() + "&"
                         + PARAM_GRANT_TYPE + "=" + "refresh_token" + "&"
                         + PARAM_REFRESH_TOKEN + "=" + spref.getString(AUTH_REFRESH_TOKEN);
 
+        Log.d(TAG, refreshAuthBody);
+
         JsonObjectRequest authRequest = new JsonObjectRequest(Request.Method.POST,
                 OAUTH2_URL,
-                authRequestBody,
+                refreshAuthBody,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jObj) {
@@ -64,7 +66,7 @@ public class RefreshAuthTokenTask {
                             Log.d(TAG, jObj.getString(AUTH_EXPIRES));
                             Log.d(TAG, jObj.getString(AUTH_REFRESH_TOKEN));
                             if (onAuthenticatedListener != null) {
-                                onAuthenticatedListener.onAuthenticated();
+                                onAuthenticatedListener.onAuthenticated(jObj.getString(AUTH_ACCESS_TOKEN));
                             }
                         } catch (JSONException e) {
                             //TODO: handle malformed json
@@ -88,7 +90,7 @@ public class RefreshAuthTokenTask {
     }
 
     public interface OnAuthenticatedListener {
-        void onAuthenticated();
+        void onAuthenticated(String auth_token);
     }
 
 

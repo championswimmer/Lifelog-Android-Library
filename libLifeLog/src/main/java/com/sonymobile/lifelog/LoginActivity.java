@@ -40,9 +40,11 @@ public class LoginActivity extends Activity {
                         GetAuthTokenTask gat = new GetAuthTokenTask(getApplicationContext());
                         gat.getAuth(authentication_code, new GetAuthTokenTask.OnAuthenticatedListener() {
                             @Override
-                            public void onAuthenticated() {
+                            public void onAuthenticated(String auth_token) {
+                                LifeLog.auth_token = auth_token;
                                 setResult(LifeLog.LOGINACTIVITY_REQUEST_CODE);
                                 finish();
+
                             }
                         });
                     }

@@ -15,11 +15,14 @@ public class LifeLog {
 
     public static final int LOGINACTIVITY_REQUEST_CODE = 2231;
 
+    public static final String API_BASE_URL = "https://platform.lifelog.sonymobile.com";
+
     public static final String LIFELOG_PREFS = "lifelog_prefs";
     static String client_id = "";
     static String client_secret = "";
     static String login_scope = "";
     static String callback_url = "";
+    static String auth_token = "";
 
     public static String getClient_id() {
         return client_id;
@@ -31,6 +34,10 @@ public class LifeLog {
 
     public static String getCallback_url() {
         return callback_url;
+    }
+
+    public static String getAuth_token() {
+        return auth_token;
     }
 
     public static void initialise(String id, String secret, String callbackUrl) {
@@ -57,7 +64,7 @@ public class LifeLog {
         return true; //TODO: return success of login
     }
 
-    public static boolean isAuthenticated(Context context) {
+    public static void checkAuthentication (Context context, final OnAuthenticationChecked oac) {
         SecurePreferences securePreferences = new SecurePreferences(
                 context,
                 LIFELOG_PREFS,
@@ -65,21 +72,27 @@ public class LifeLog {
                 true
         );
         if (securePreferences.containsKey(GetAuthTokenTask.AUTH_ACCESS_TOKEN)) {
+            auth_token = securePreferences.getString(GetAuthTokenTask.AUTH_ACCESS_TOKEN);
             long expires = Long.valueOf(securePreferences.getString(GetAuthTokenTask.AUTH_EXPIRES));
             long expires_in = expires - System.currentTimeMillis();
             if (expires_in > 120000) {
-                return true;
+                oac.onAuthChecked(true);
             } else {
                 RefreshAuthTokenTask ratt = new RefreshAuthTokenTask(context);
                 ratt.refreshAuth(new RefreshAuthTokenTask.OnAuthenticatedListener() {
                     @Override
-                    public void onAuthenticated() {
-
+                    public void onAuthenticated(String token) {
+                        auth_token = token;
+                        oac.onAuthChecked(true);
                     }
                 });
             }
         }
-        return false;
+        oac.onAuthChecked(false);
+    }
+
+    public interface OnAuthenticationChecked {
+        void onAuthChecked (boolean authenticated);
     }
 
     public static class Scopes {
