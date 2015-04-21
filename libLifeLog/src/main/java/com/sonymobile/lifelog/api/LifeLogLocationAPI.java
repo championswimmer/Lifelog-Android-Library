@@ -130,8 +130,8 @@ public class LifeLogLocationAPI {
                 Map<String, String> headerMap = new HashMap<>(5);
                 headerMap.put("Authorization", "Bearer " + authToken);
                 headerMap.put("Accept", "application/json");
-                headerMap.put("Accept-Encoding", "gzip");
-                headerMap.put("Content-Encoding", "gzip");
+                //headerMap.put("Accept-Encoding", "gzip");
+                //headerMap.put("Content-Encoding", "gzip");
                 return headerMap;
             }
         };
@@ -140,7 +140,7 @@ public class LifeLogLocationAPI {
     }
 
     public static class LifeLogLocation {
-        public static class source {
+        public static class sourceClass {
             String name = "";
             String type = "";
             String id = "";
@@ -152,13 +152,14 @@ public class LifeLogLocationAPI {
 
         public LifeLogLocation(JSONObject jobj) throws JSONException {
             id = jobj.getString("id");
-            sources = new source[5];
+            source = new sourceClass();
             JSONArray jarr = jobj.getJSONArray("sources");
             for (int i = 0; i < jarr.length(); i++) {
                 try {
-                    //sources[i].id = jarr.getJSONObject(i).getString("id");
-                    sources[i].name = jarr.getJSONObject(i).getString("name");
-                    sources[i].type = jarr.getJSONObject(i).getString("type");
+                    //Log.d(TAG, "jarr " + jarr.getJSONObject(i).toString());
+                    source.id = jarr.getJSONObject(i).getString("id");
+                    source.name = jarr.getJSONObject(i).getString("name");
+                    source.type = jarr.getJSONObject(i).getString("type");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -174,7 +175,7 @@ public class LifeLogLocationAPI {
         }
 
         String id = "";
-        source[] sources = new source[5];
+        sourceClass source = new sourceClass();
         String startTime = "";
         String endTime = "";
         positionClass position = new positionClass();
@@ -193,8 +194,8 @@ public class LifeLogLocationAPI {
             return ISO8601Date.toCalendar(endTime);
         }
 
-        public source[] getSources() {
-            return sources;
+        public sourceClass getSource() {
+            return source;
         }
 
         public int getAltitude() {

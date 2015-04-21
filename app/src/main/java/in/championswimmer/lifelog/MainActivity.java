@@ -38,7 +38,7 @@ public class MainActivity extends ActionBarActivity {
             public void onAuthChecked(boolean authenticated) {
                 if (authenticated) {
                     Toast.makeText(MainActivity.this, "authed", Toast.LENGTH_SHORT).show();
-                    LifeLogLocationAPI llLocation = LifeLogLocationAPI.prepareRequest(10);
+                    LifeLogLocationAPI llLocation = LifeLogLocationAPI.prepareRequest(500);
                     llLocation.get(MainActivity.this, new LifeLogLocationAPI.OnLocationFetched() {
                         @Override
                         public void onLocationFetched(ArrayList<LifeLogLocationAPI.LifeLogLocation> locations) {
