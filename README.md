@@ -6,6 +6,7 @@ This is an Android (not pure java) wrapper for the [LifeLog Web API](https://dev
  bear with the cumbersome process of manually downloading source
  and adding it till then </b>
 
+
 ###Initialise
 In your Application class, inside the _onCreate_ body, add this
 
@@ -16,7 +17,8 @@ LifeLog.initialise("clientid", "secret", "https://callbackurl.com");
 Replace _clientid_, _secret_ and _callbackurl_ with your respective values of the app that
 you have registered on LifeLog.
 
-###Login
+###Login and authentication
+####Login
 To log the user in for the first time, use this simple static method
 
 ```java
@@ -31,7 +33,49 @@ Internally, `doLogin` makes a `startActivityForResult` call. Handle the returnin
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == LifeLog.LOGINACTIVITY_REQUEST_CODE) {
+            //we are logged in, do what you please now
             Toast.makeText(this, "User authenticated", Toast.LENGTH_SHORT).show();
         }
     }
+```
+
+####Checking Authentication state
+You would want to check if the user is authenticated or not. Even if he is, we may need to refresh
+the auth token. Again, simple code for that.
+```java
+LifeLog.checkAuthentication(this, new LifeLog.OnAuthenticationChecked() {
+    @Override
+    public void onAuthChecked(boolean authenticated) {
+        if (authenticated) {
+            //User is authenticated, we can do API requests now
+        } else {
+            //User is not authenticated. Make him login (or whatever suits your app's flow)
+            //LifeLog.doLogin(MainActivity.this);
+        }
+    }
+});
+```
+
+###API Requests
+####Location endpoint
+Create an object of `LifeLogLocationAPI` using one of the two _prepareRequest_ methods.
+One allows you to specify start and end time. Other doesn't. You can set either of start or end
+time to be `null` as well.
+
+The data fetching actually starts when _get_ is called. After the data is fetched, the `onLocationFetched`
+callback is hit.
+A List<> of LifeLogLocation objects are at your disposal.
+
+```java
+LifeLogLocationAPI llLocation = LifeLogLocationAPI.prepareRequest(500);
+    llLocation.get(MainActivity.this, new LifeLogLocationAPI.OnLocationFetched() {
+        @Override
+        public void onLocationFetched(ArrayList<LifeLogLocationAPI.LifeLogLocation> locations) {
+            for (LifeLogLocationAPI.LifeLogLocation loc : locations) {
+                String id = loc.getId();
+                Calendar startTime = loc.getStartTime();
+                //continue likewise
+            }
+        }
+    });
 ```

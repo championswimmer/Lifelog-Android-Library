@@ -43,6 +43,7 @@ public class MainActivity extends ActionBarActivity {
                         @Override
                         public void onLocationFetched(ArrayList<LifeLogLocationAPI.LifeLogLocation> locations) {
                             Log.d(TAG, locations.get(0).getId());
+
                         }
                     });
                 } else {
