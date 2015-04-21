@@ -39,6 +39,8 @@ public class LifeLogLocationAPI {
     Integer limit;
     String authToken;
 
+    static JsonObjectRequest lastLocationRequest;
+
     static String LOCATION_BASE_URL = LifeLog.API_BASE_URL + "/v1/users/me/locations";
 
     public LifeLogLocationAPI(Calendar start, Calendar end, Integer lim) {
@@ -57,7 +59,7 @@ public class LifeLogLocationAPI {
         return prepareRequest(null, null, lim);
     }
 
-    public void get(Context context, final OnLocationFetched olf) {
+    public void get(final Context context, final OnLocationFetched olf) {
         Log.v(TAG, "get called");
         final ArrayList<LifeLogLocation> locations = new ArrayList<>(limit);
         LifeLog.checkAuthentication(context, new LifeLog.OnAuthenticationChecked() {
@@ -80,19 +82,35 @@ public class LifeLogLocationAPI {
         if (params.length() > 1) {
             requestUrl += "?" + params;
         }
-        JsonObjectRequest locationRequest = new JsonObjectRequest(Request.Method.GET,
+        final JsonObjectRequest locationRequest = new JsonObjectRequest(Request.Method.GET,
                 requestUrl,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject) {
                         Log.v(TAG, jsonObject.toString());
                         try {
+                            if (jsonObject.has("error")) {
+                                if (jsonObject.getJSONObject("error").getString("code").contains("401")) {
+                                    LifeLog.checkAuthentication(context, new LifeLog.OnAuthenticationChecked() {
+                                        @Override
+                                        public void onAuthChecked(boolean authenticated) {
+                                            if (authenticated && (lastLocationRequest != null))
+                                                VolleySingleton.getInstance(context).addToRequestQueue(lastLocationRequest);
+                                        }
+                                    });
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        try {
                             JSONArray resultArray = jsonObject.getJSONArray("result");
                             for (int i = 0; i < resultArray.length(); i++) {
                                     locations.add(new LifeLogLocation(resultArray.getJSONObject(i)));
                             }
-
                             olf.onLocationFetched(locations);
+                            lastLocationRequest = null;
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -117,6 +135,7 @@ public class LifeLogLocationAPI {
                 return headerMap;
             }
         };
+        lastLocationRequest = locationRequest;
         VolleySingleton.getInstance(context).addToRequestQueue(locationRequest);
     }
 
