@@ -26,6 +26,10 @@ public class MainActivity extends ActionBarActivity {
                 LifeLog.doLogin(MainActivity.this);
             }
         });
+
+        boolean auth = LifeLog.isAuthenticated(this);
+        if (auth)
+            Toast.makeText(this, "authed", Toast.LENGTH_SHORT).show();
     }
 
     @Override

@@ -42,25 +42,15 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class SecurePreferences {
 
-    public static class SecurePreferencesException extends RuntimeException {
-
-        public SecurePreferencesException(Throwable e) {
-            super(e);
-        }
-
-    }
-
     private static final String TRANSFORMATION = "AES/CBC/PKCS5Padding";
     private static final String KEY_TRANSFORMATION = "AES/ECB/PKCS5Padding";
     private static final String SECRET_KEY_HASH_TRANSFORMATION = "SHA-256";
     private static final String CHARSET = "UTF-8";
-
     private final boolean encryptKeys;
     private final Cipher writer;
     private final Cipher reader;
     private final Cipher keyWriter;
     private final SharedPreferences preferences;
-
     /**
      * This will initialize an instance of the SecurePreferences class
      *
@@ -87,6 +77,14 @@ public class SecurePreferences {
         } catch (GeneralSecurityException e) {
             throw new SecurePreferencesException(e);
         } catch (UnsupportedEncodingException e) {
+            throw new SecurePreferencesException(e);
+        }
+    }
+
+    private static byte[] convert(Cipher cipher, byte[] bs) throws SecurePreferencesException {
+        try {
+            return cipher.doFinal(bs);
+        } catch (Exception e) {
             throw new SecurePreferencesException(e);
         }
     }
@@ -180,11 +178,11 @@ public class SecurePreferences {
         }
     }
 
-    private static byte[] convert(Cipher cipher, byte[] bs) throws SecurePreferencesException {
-        try {
-            return cipher.doFinal(bs);
-        } catch (Exception e) {
-            throw new SecurePreferencesException(e);
+    public static class SecurePreferencesException extends RuntimeException {
+
+        public SecurePreferencesException(Throwable e) {
+            super(e);
         }
+
     }
 }

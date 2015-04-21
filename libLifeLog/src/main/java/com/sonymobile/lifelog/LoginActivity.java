@@ -1,4 +1,4 @@
-package com.sonymobile.lifelog.login;
+package com.sonymobile.lifelog;
 
 import android.app.Activity;
 import android.os.Build;
@@ -8,8 +8,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.sonymobile.lifelog.LifeLog;
-import com.sonymobile.lifelog.R;
+import com.sonymobile.lifelog.auth.GetAuthTokenTask;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

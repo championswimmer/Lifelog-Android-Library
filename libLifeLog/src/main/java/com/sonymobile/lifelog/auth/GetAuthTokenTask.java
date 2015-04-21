@@ -1,10 +1,8 @@
-package com.sonymobile.lifelog.login;
+package com.sonymobile.lifelog.auth;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.util.Log;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -13,14 +11,10 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.sonymobile.lifelog.LifeLog;
 import com.sonymobile.lifelog.utils.SecurePreferences;
+import com.sonymobile.lifelog.utils.VolleySingleton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by championswimmer on 21/4/15.
@@ -28,13 +22,11 @@ import java.util.Map;
 public class GetAuthTokenTask {
 
     private Context mContext;
-    RequestQueue loginQueue;
 
     private OnAuthenticatedListener onAuthenticatedListener;
 
     public GetAuthTokenTask(Context context) {
         this.mContext = context;
-        loginQueue = Volley.newRequestQueue(mContext);
     }
 
     public static final String TAG = "LifeLog:GetAuthToken";
@@ -49,9 +41,10 @@ public class GetAuthTokenTask {
     public static final String AUTH_ACCESS_TOKEN = "access_token";
     public static final String AUTH_ISSUED_AT = "issued_at";
     public static final String AUTH_EXPIRES_IN = "expires_in";
+    public static final String AUTH_EXPIRES = "expires";
     public static final String AUTH_REFRESH_TOKEN = "refresh_token";
 
-    protected void getAuth(final String authCode, OnAuthenticatedListener oal) {
+    public void getAuth(final String authCode, OnAuthenticatedListener oal) {
         onAuthenticatedListener = oal;
 
         final String authRequestBody =
@@ -71,10 +64,11 @@ public class GetAuthTokenTask {
                                     LifeLog.LIFELOG_PREFS, LifeLog.getClient_secret(), true);
                             spref.put(AUTH_ACCESS_TOKEN, jObj.getString(AUTH_ACCESS_TOKEN));
                             spref.put(AUTH_EXPIRES_IN, jObj.getString(AUTH_EXPIRES_IN));
+                            spref.put(AUTH_EXPIRES, jObj.getString(AUTH_EXPIRES));
                             spref.put(AUTH_ISSUED_AT, jObj.getString(AUTH_ISSUED_AT));
                             spref.put(AUTH_REFRESH_TOKEN, jObj.getString(AUTH_REFRESH_TOKEN));
                             Log.d(TAG, jObj.getString(AUTH_ACCESS_TOKEN));
-                            Log.d(TAG, jObj.getString(AUTH_EXPIRES_IN));
+                            Log.d(TAG, jObj.getString(AUTH_EXPIRES));
                             Log.d(TAG, jObj.getString(AUTH_REFRESH_TOKEN));
                             if (onAuthenticatedListener != null) {
                                 onAuthenticatedListener.onAuthenticated();
@@ -97,7 +91,7 @@ public class GetAuthTokenTask {
                 return String.format("application/x-www-form-urlencoded; charset=%s", new Object[]{"utf-8"});
             }
         };
-        loginQueue.add(authRequest);
+        VolleySingleton.getInstance(mContext).addToRequestQueue(authRequest);
     }
 
     public interface OnAuthenticatedListener {

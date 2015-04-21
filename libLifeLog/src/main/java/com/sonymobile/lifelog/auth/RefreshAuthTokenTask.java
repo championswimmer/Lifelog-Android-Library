@@ -1,0 +1,102 @@
+package com.sonymobile.lifelog.auth;
+
+import android.content.Context;
+import android.util.Log;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.sonymobile.lifelog.LifeLog;
+import com.sonymobile.lifelog.utils.SecurePreferences;
+import com.sonymobile.lifelog.utils.VolleySingleton;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+/**
+ * Created by championswimmer on 21/4/15.
+ */
+public class RefreshAuthTokenTask {
+
+    private Context mContext;
+    private OnAuthenticatedListener onAuthenticatedListener;
+
+    public RefreshAuthTokenTask(Context context) {
+        this.mContext = context;
+    }
+
+    public static final String TAG = "LifeLog:GetAuthToken";
+
+    public static final String OAUTH2_URL = "https://platform.lifelog.sonymobile.com/oauth/2/refresh_token";
+
+    static String PARAM_CLIENT_ID = "client_id";
+    static String PARAM_CLIENT_SECRET = "client_secret";
+    static String PARAM_GRANT_TYPE = "grant_type";
+    static String PARAM_REFRESH_TOKEN = "refresh_token";
+
+    public static final String AUTH_ACCESS_TOKEN = "access_token";
+    public static final String AUTH_ISSUED_AT = "issued_at";
+    public static final String AUTH_EXPIRES_IN = "expires_in";
+    public static final String AUTH_EXPIRES = "expires";
+    public static final String AUTH_REFRESH_TOKEN = "refresh_token";
+
+    public void refreshAuth(OnAuthenticatedListener oal) {
+        onAuthenticatedListener = oal;
+        final SecurePreferences spref = new SecurePreferences(mContext,
+                LifeLog.LIFELOG_PREFS, LifeLog.getClient_secret(), true);
+
+        final String authRequestBody =
+                PARAM_CLIENT_ID + "=" + LifeLog.getClient_id() + "&"
+                        + PARAM_CLIENT_SECRET + "=" + LifeLog.getClient_secret() + "&"
+                        + PARAM_GRANT_TYPE + "=" + "refresh_token" + "&"
+                        + PARAM_REFRESH_TOKEN + "=" + spref.getString(AUTH_REFRESH_TOKEN);
+
+        JsonObjectRequest authRequest = new JsonObjectRequest(Request.Method.POST,
+                OAUTH2_URL,
+                authRequestBody,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject jObj) {
+                        try {
+
+                            spref.put(AUTH_ACCESS_TOKEN, jObj.getString(AUTH_ACCESS_TOKEN));
+                            spref.put(AUTH_EXPIRES_IN, jObj.getString(AUTH_EXPIRES_IN));
+                            spref.put(AUTH_EXPIRES, jObj.getString(AUTH_EXPIRES));
+                            spref.put(AUTH_ISSUED_AT, jObj.getString(AUTH_ISSUED_AT));
+                            spref.put(AUTH_REFRESH_TOKEN, jObj.getString(AUTH_REFRESH_TOKEN));
+                            Log.d(TAG, jObj.getString(AUTH_ACCESS_TOKEN));
+                            Log.d(TAG, jObj.getString(AUTH_EXPIRES));
+                            Log.d(TAG, jObj.getString(AUTH_REFRESH_TOKEN));
+                            if (onAuthenticatedListener != null) {
+                                onAuthenticatedListener.onAuthenticated();
+                            }
+                        } catch (JSONException e) {
+                            //TODO: handle malformed json
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+
+                    }
+                }
+        ) {
+            @Override
+            public String getBodyContentType() {
+                return String.format("application/x-www-form-urlencoded; charset=%s", new Object[]{"utf-8"});
+            }
+        };
+        VolleySingleton.getInstance(mContext).addToRequestQueue(authRequest);
+    }
+
+    public interface OnAuthenticatedListener {
+        void onAuthenticated();
+    }
+
+
+}
