@@ -16,13 +16,6 @@ public class LifeLog {
     public static final int LOGINACTIVITY_REQUEST_CODE = 2231;
 
     public static final String LIFELOG_PREFS = "lifelog_prefs";
-
-    public static class Scopes {
-        public static final String PROFILE_READ = "lifelog.profile.read";
-        public static final String ACTIVITIES_READ = "lifelog.activities.read";
-        public static final String LOCATIONS_READ = "lifelog.locations.read";
-    }
-
     static String client_id = "";
     static String client_secret = "";
     static String login_scope = "";
@@ -47,15 +40,15 @@ public class LifeLog {
         setScope(Scopes.PROFILE_READ, Scopes.ACTIVITIES_READ, Scopes.LOCATIONS_READ);
     }
 
+    public static String getScope() {
+        return login_scope;
+    }
+
     public static void setScope(String... scopes) {
         login_scope = "";
         for (String scope : scopes) {
             login_scope += "+" + scope;
         }
-    }
-
-    public static String getScope() {
-        return login_scope;
     }
 
     public static boolean doLogin(Activity activity) {
@@ -64,7 +57,7 @@ public class LifeLog {
         return true; //TODO: return success of login
     }
 
-    public static boolean isAuthenticated (Context context) {
+    public static boolean isAuthenticated(Context context) {
         SecurePreferences securePreferences = new SecurePreferences(
                 context,
                 LIFELOG_PREFS,
@@ -87,5 +80,11 @@ public class LifeLog {
             }
         }
         return false;
+    }
+
+    public static class Scopes {
+        public static final String PROFILE_READ = "lifelog.profile.read";
+        public static final String ACTIVITIES_READ = "lifelog.activities.read";
+        public static final String LOCATIONS_READ = "lifelog.locations.read";
     }
 }

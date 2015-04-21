@@ -4,11 +4,9 @@ import android.content.Context;
 import android.util.Log;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import com.sonymobile.lifelog.LifeLog;
 import com.sonymobile.lifelog.utils.SecurePreferences;
 import com.sonymobile.lifelog.utils.VolleySingleton;
@@ -21,28 +19,22 @@ import org.json.JSONObject;
  */
 public class GetAuthTokenTask {
 
-    private Context mContext;
-
-    private OnAuthenticatedListener onAuthenticatedListener;
-
-    public GetAuthTokenTask(Context context) {
-        this.mContext = context;
-    }
-
     public static final String TAG = "LifeLog:GetAuthToken";
-
     public static final String OAUTH2_URL = "https://platform.lifelog.sonymobile.com/oauth/2/token";
-
-    static String PARAM_CLIENT_ID = "client_id";
-    static String PARAM_CLIENT_SECRET = "client_secret";
-    static String PARAM_GRANT_TYPE = "grant_type";
-    static String PARAM_CODE = "code";
-
     public static final String AUTH_ACCESS_TOKEN = "access_token";
     public static final String AUTH_ISSUED_AT = "issued_at";
     public static final String AUTH_EXPIRES_IN = "expires_in";
     public static final String AUTH_EXPIRES = "expires";
     public static final String AUTH_REFRESH_TOKEN = "refresh_token";
+    static String PARAM_CLIENT_ID = "client_id";
+    static String PARAM_CLIENT_SECRET = "client_secret";
+    static String PARAM_GRANT_TYPE = "grant_type";
+    static String PARAM_CODE = "code";
+    private Context mContext;
+    private OnAuthenticatedListener onAuthenticatedListener;
+    public GetAuthTokenTask(Context context) {
+        this.mContext = context;
+    }
 
     public void getAuth(final String authCode, OnAuthenticatedListener oal) {
         onAuthenticatedListener = oal;

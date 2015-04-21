@@ -17,9 +17,8 @@ import java.util.regex.Pattern;
  * Created by championswimmer on 21/4/15.
  */
 public class LoginActivity extends Activity {
-    String authentication_code = "";
     static Pattern AUTH_CODE_PATTERN = Pattern.compile("(code)" + "(=)" + "(.*)");
-
+    String authentication_code = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

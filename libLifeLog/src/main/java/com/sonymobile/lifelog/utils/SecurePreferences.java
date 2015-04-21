@@ -51,6 +51,7 @@ public class SecurePreferences {
     private final Cipher reader;
     private final Cipher keyWriter;
     private final SharedPreferences preferences;
+
     /**
      * This will initialize an instance of the SecurePreferences class
      *
