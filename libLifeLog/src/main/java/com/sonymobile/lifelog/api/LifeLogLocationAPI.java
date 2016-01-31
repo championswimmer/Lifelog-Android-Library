@@ -83,7 +83,7 @@ public class LifeLogLocationAPI {
             requestUrl += "?" + params;
         }
         final JsonObjectRequest locationRequest = new JsonObjectRequest(Request.Method.GET,
-                requestUrl,
+                requestUrl, (JSONObject) null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject) {
