@@ -1,8 +1,11 @@
 package com.sonymobile.lifelog;
 
 import android.app.Activity;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -17,6 +20,8 @@ import java.util.regex.Pattern;
  * Created by championswimmer on 21/4/15.
  */
 public class LoginActivity extends Activity {
+    private static final Uri AUTH_BASE_URL = Uri.parse("https://platform.lifelog.sonymobile.com/oauth/2/authorize");
+
     static Pattern AUTH_CODE_PATTERN = Pattern.compile("(code)" + "(=)" + "(.*)");
     String authentication_code = "";
 
@@ -54,11 +59,16 @@ public class LoginActivity extends Activity {
             }
         });
 
-        wv.loadUrl("https://platform.lifelog.sonymobile.com/oauth/2/authorize?client_id="
-                + LifeLog.getClient_id()
-                + "&scope="
-                + LifeLog.getScope());
+        if (TextUtils.isEmpty(LifeLog.getScope())) {
+            throw new RuntimeException("Scope parameter is empty!");
+        }
 
+        Uri uri = AUTH_BASE_URL.buildUpon()
+                .appendQueryParameter("client_id", LifeLog.getClient_id())
+                .appendQueryParameter("scope", LifeLog.getScope()).build();
+
+
+        wv.loadUrl(uri.toString());
     }
 
 }
