@@ -5,8 +5,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -25,22 +26,27 @@ public class LoginActivity extends Activity {
     static Pattern AUTH_CODE_PATTERN = Pattern.compile("(code)" + "(=)" + "(.*)");
     String authentication_code = "";
 
+    private WebView mWebView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        requestWindowFeature(Window.FEATURE_PROGRESS);
+
         setContentView(R.layout.activity_login);
 
-        final WebView wv = (WebView) findViewById(R.id.webview);
+        mWebView = (WebView) findViewById(R.id.webview);
         if (Build.VERSION.SDK_INT >= 19) {
-            wv.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+            mWebView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         }
-        wv.setWebViewClient(new WebViewClient() {
+        mWebView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 if (url.contains(LifeLog.getCallback_url())) {
                     Matcher m = AUTH_CODE_PATTERN.matcher(url);
                     if (m.find()) {
-                        wv.setVisibility(View.GONE);
+                        mWebView.setVisibility(View.GONE);
                         authentication_code = m.group(3);
                         GetAuthTokenTask gat = new GetAuthTokenTask(getApplicationContext());
                         gat.getAuth(authentication_code, new GetAuthTokenTask.OnAuthenticatedListener() {
@@ -59,6 +65,14 @@ public class LoginActivity extends Activity {
             }
         });
 
+        mWebView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public void onProgressChanged(WebView view, int newProgress) {
+                super.onProgressChanged(view, newProgress);
+                setProgress(newProgress * 100);
+            }
+        });
+
         if (TextUtils.isEmpty(LifeLog.getScope())) {
             throw new RuntimeException("Scope parameter is empty!");
         }
@@ -67,8 +81,46 @@ public class LoginActivity extends Activity {
                 .appendQueryParameter("client_id", LifeLog.getClient_id())
                 .appendQueryParameter("scope", LifeLog.getScope()).build();
 
-
-        wv.loadUrl(uri.toString());
+        mWebView.loadUrl(uri.toString());
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mWebView.onResume();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mWebView.saveState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        mWebView.restoreState(savedInstanceState);
+        super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    @Override
+    protected void onPause() {
+        mWebView.onPause();
+        super.onPause();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mWebView.canGoBack()) {
+            mWebView.goBack();
+        } else {
+            setResult(RESULT_CANCELED);
+            finish();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        mWebView.destroy();
+        super.onDestroy();
+    }
 }
