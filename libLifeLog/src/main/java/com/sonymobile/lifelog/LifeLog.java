@@ -3,6 +3,7 @@ package com.sonymobile.lifelog;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.text.TextUtils;
 
 import com.sonymobile.lifelog.auth.GetAuthTokenTask;
 import com.sonymobile.lifelog.auth.RefreshAuthTokenTask;
@@ -54,7 +55,11 @@ public class LifeLog {
     public static void setScope(String... scopes) {
         login_scope = "";
         for (String scope : scopes) {
-            login_scope += "+" + scope;
+            if (TextUtils.isEmpty(login_scope)) {
+                login_scope = scope;
+            } else {
+                login_scope += "+" + scope;
+            }
         }
     }
 
