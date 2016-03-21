@@ -19,18 +19,18 @@ import org.json.JSONObject;
  */
 public class GetAuthTokenTask {
 
-    public static final String TAG = "LifeLog:GetAuthToken";
-    public static final String OAUTH2_URL = "https://platform.lifelog.sonymobile.com/oauth/2/token";
+    private static final String TAG = "LifeLog:GetAuthToken";
+    private static final String OAUTH2_URL = "https://platform.lifelog.sonymobile.com/oauth/2/token";
     public static final String AUTH_ACCESS_TOKEN = "access_token";
     public static final String AUTH_EXPIRES_IN = "expires_in";
     public static final String AUTH_REFRESH_TOKEN = "refresh_token";
     public static final String AUTH_TOKEN_TYPE = "token_type";
     public static final String AUTH_REFRESH_TOKEN_EXPIRES_IN = "refresh_token_expires_in";
-    static String PARAM_CLIENT_ID = "client_id";
-    static String PARAM_CLIENT_SECRET = "client_secret";
-    static String PARAM_GRANT_TYPE = "grant_type";
-    static String PARAM_CODE = "code";
-    private Context mContext;
+    private final static String PARAM_CLIENT_ID = "client_id";
+    private final static String PARAM_CLIENT_SECRET = "client_secret";
+    private final static String PARAM_GRANT_TYPE = "grant_type";
+    private final static String PARAM_CODE = "code";
+    private final Context mContext;
     private OnAuthenticatedListener onAuthenticatedListener;
     public GetAuthTokenTask(Context context) {
         this.mContext = context;
