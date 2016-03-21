@@ -63,10 +63,13 @@ public class LifeLog {
         }
     }
 
-    public static boolean doLogin(Activity activity) {
+    /**
+     * Initiate login operation with {@link com.sonymobile.lifelog.LifeLog#LOGINACTIVITY_REQUEST_CODE},
+     * callback will be delivered to {@link Activity#onActivityResult(int, int, Intent)}.
+     */
+    public static void doLogin(Activity activity) {
         Intent loginIntent = new Intent(activity, LoginActivity.class);
         activity.startActivityForResult(loginIntent, LOGINACTIVITY_REQUEST_CODE);
-        return true; //TODO: return success of login
     }
 
     public static void checkAuthentication (Context context, final OnAuthenticationChecked oac) {

@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.webkit.WebChromeClient;
@@ -13,6 +14,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.sonymobile.lifelog.auth.GetAuthTokenTask;
+import com.sonymobile.lifelog.utils.Debug;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,6 +23,7 @@ import java.util.regex.Pattern;
  * Created by championswimmer on 21/4/15.
  */
 public class LoginActivity extends Activity {
+    private static final String TAG = LoginActivity.class.getSimpleName();
     private static final Uri AUTH_BASE_URL = Uri.parse("https://platform.lifelog.sonymobile.com/oauth/2/authorize");
 
     static Pattern AUTH_CODE_PATTERN = Pattern.compile("(code)" + "(=)" + "(.*)");
@@ -51,11 +54,19 @@ public class LoginActivity extends Activity {
                         GetAuthTokenTask gat = new GetAuthTokenTask(getApplicationContext());
                         gat.getAuth(authentication_code, new GetAuthTokenTask.OnAuthenticatedListener() {
                             @Override
-                            public void onAuthenticated(String auth_token) {
-                                LifeLog.auth_token = auth_token;
-                                setResult(LifeLog.LOGINACTIVITY_REQUEST_CODE);
+                            public void onAuthenticated(String authToken) {
+                                LifeLog.auth_token = authToken;
+                                setResult(RESULT_OK);
                                 finish();
+                            }
 
+                            @Override
+                            public void onError(Exception e) {
+                                if (Debug.isDebuggable(LoginActivity.this)) {
+                                    Log.w(TAG, "onError", e);
+                                }
+                                setResult(RESULT_CANCELED);
+                                finish();
                             }
                         });
                     }

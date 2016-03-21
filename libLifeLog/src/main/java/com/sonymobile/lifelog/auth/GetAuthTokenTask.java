@@ -69,7 +69,9 @@ public class GetAuthTokenTask {
                                 onAuthenticatedListener.onAuthenticated(jObj.getString(AUTH_ACCESS_TOKEN));
                             }
                         } catch (JSONException e) {
-                            //TODO: handle malformed json
+                            if (onAuthenticatedListener != null) {
+                                onAuthenticatedListener.onError(e);
+                            }
                         }
 
                     }
@@ -77,7 +79,9 @@ public class GetAuthTokenTask {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
-
+                        if (onAuthenticatedListener != null) {
+                            onAuthenticatedListener.onError(volleyError);
+                        }
                     }
                 }
         ) {
@@ -90,7 +94,8 @@ public class GetAuthTokenTask {
     }
 
     public interface OnAuthenticatedListener {
-        void onAuthenticated(String auth_token);
+        void onAuthenticated(String authToken);
+        void onError(Exception e);
     }
 
 
