@@ -22,10 +22,10 @@ public class GetAuthTokenTask {
     public static final String TAG = "LifeLog:GetAuthToken";
     public static final String OAUTH2_URL = "https://platform.lifelog.sonymobile.com/oauth/2/token";
     public static final String AUTH_ACCESS_TOKEN = "access_token";
-    public static final String AUTH_ISSUED_AT = "issued_at";
     public static final String AUTH_EXPIRES_IN = "expires_in";
-    public static final String AUTH_EXPIRES = "expires";
     public static final String AUTH_REFRESH_TOKEN = "refresh_token";
+    public static final String AUTH_TOKEN_TYPE = "token_type";
+    public static final String AUTH_REFRESH_TOKEN_EXPIRES_IN = "refresh_token_expires_in";
     static String PARAM_CLIENT_ID = "client_id";
     static String PARAM_CLIENT_SECRET = "client_secret";
     static String PARAM_GRANT_TYPE = "grant_type";
@@ -56,11 +56,11 @@ public class GetAuthTokenTask {
                                     LifeLog.LIFELOG_PREFS, LifeLog.getClient_secret(), true);
                             spref.put(AUTH_ACCESS_TOKEN, jObj.getString(AUTH_ACCESS_TOKEN));
                             spref.put(AUTH_EXPIRES_IN, jObj.getString(AUTH_EXPIRES_IN));
-                            spref.put(AUTH_EXPIRES, jObj.getString(AUTH_EXPIRES));
-                            spref.put(AUTH_ISSUED_AT, jObj.getString(AUTH_ISSUED_AT));
+                            spref.put(AUTH_TOKEN_TYPE, jObj.getString(AUTH_TOKEN_TYPE));
                             spref.put(AUTH_REFRESH_TOKEN, jObj.getString(AUTH_REFRESH_TOKEN));
+                            spref.put(AUTH_REFRESH_TOKEN_EXPIRES_IN,
+                                      jObj.getString(AUTH_REFRESH_TOKEN_EXPIRES_IN));
                             Log.d(TAG, jObj.getString(AUTH_ACCESS_TOKEN));
-                            Log.d(TAG, jObj.getString(AUTH_EXPIRES));
                             Log.d(TAG, jObj.getString(AUTH_REFRESH_TOKEN));
                             if (onAuthenticatedListener != null) {
                                 onAuthenticatedListener.onAuthenticated(jObj.getString(AUTH_ACCESS_TOKEN));
