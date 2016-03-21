@@ -78,9 +78,8 @@ public class LifeLog {
         );
         if (securePreferences.containsKey(GetAuthTokenTask.AUTH_ACCESS_TOKEN)) {
             auth_token = securePreferences.getString(GetAuthTokenTask.AUTH_ACCESS_TOKEN);
-            long expires = Long.valueOf(securePreferences.getString(GetAuthTokenTask.AUTH_EXPIRES));
-            long expires_in = expires - System.currentTimeMillis();
-            if (expires_in > 120000) {
+            long expires_in = Long.valueOf(securePreferences.getString(GetAuthTokenTask.AUTH_EXPIRES_IN));
+            if (expires_in > 120) {
                 oac.onAuthChecked(true);
             } else {
                 RefreshAuthTokenTask ratt = new RefreshAuthTokenTask(context);
