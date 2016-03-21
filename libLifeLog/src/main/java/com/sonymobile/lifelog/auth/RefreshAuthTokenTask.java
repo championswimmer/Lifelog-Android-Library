@@ -14,6 +14,8 @@ import com.sonymobile.lifelog.utils.VolleySingleton;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.nio.charset.Charset;
+
 /**
  * Created by championswimmer on 21/4/15.
  */
@@ -51,7 +53,7 @@ public class RefreshAuthTokenTask {
 
         JsonObjectRequest authRequest = new JsonObjectRequest(Request.Method.POST,
                 OAUTH2_URL,
-                refreshAuthBody,
+                null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jObj) {
@@ -85,6 +87,12 @@ public class RefreshAuthTokenTask {
             public String getBodyContentType() {
                 return String.format("application/x-www-form-urlencoded; charset=%s", new Object[]{"utf-8"});
             }
+
+            @Override
+            public byte[] getBody() {
+                return refreshAuthBody.getBytes(Charset.forName("utf-8"));
+            }
+
         };
         VolleySingleton.getInstance(mContext).addToRequestQueue(authRequest);
     }
