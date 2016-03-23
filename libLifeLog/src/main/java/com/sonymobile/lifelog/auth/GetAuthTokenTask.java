@@ -8,6 +8,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.sonymobile.lifelog.LifeLog;
+import com.sonymobile.lifelog.utils.Debug;
 import com.sonymobile.lifelog.utils.SecurePreferences;
 import com.sonymobile.lifelog.utils.VolleySingleton;
 
@@ -60,8 +61,10 @@ public class GetAuthTokenTask {
                             spref.put(AUTH_REFRESH_TOKEN, jObj.getString(AUTH_REFRESH_TOKEN));
                             spref.put(AUTH_REFRESH_TOKEN_EXPIRES_IN,
                                       jObj.getString(AUTH_REFRESH_TOKEN_EXPIRES_IN));
-                            Log.d(TAG, jObj.getString(AUTH_ACCESS_TOKEN));
-                            Log.d(TAG, jObj.getString(AUTH_REFRESH_TOKEN));
+                            if (Debug.isDebuggable(mContext)) {
+                                Log.d(TAG, jObj.getString(AUTH_ACCESS_TOKEN));
+                                Log.d(TAG, jObj.getString(AUTH_REFRESH_TOKEN));
+                            }
                             if (onAuthenticatedListener != null) {
                                 onAuthenticatedListener.onAuthenticated(jObj.getString(AUTH_ACCESS_TOKEN));
                             }
