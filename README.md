@@ -1,10 +1,31 @@
 #LifeLog Android Library
 This is an Android (not pure java) wrapper for the [LifeLog Web API](https://developer.sony.com/develop/services/lifelog-api).
 
-##QuickStart
- <b> I will upload this maven & jcenter soon,
- bear with the cumbersome process of manually downloading source
- and adding it till then </b>
+[![Book session on Codementor](https://cdn.codementor.io/badges/book_session_github.svg)](https://www.codementor.io/championswimmer?utm_source=github&utm_medium=button&utm_term=championswimmer&utm_campaign=github)
+
+[![Release](https://img.shields.io/github/release/championswimmer/Lifelog-Android-Library.svg?label=maven)](https://jitpack.io/#championswimmer/Lifelog-Android-Library/1.0)
+
+### How to add to your project
+
+Add it using jitpack maven distribution.  
+Add the jitpack maven repository
+
+```groovy
+    repositories {
+        jcenter()
+        maven {
+            url "https://jitpack.io"
+        }
+    }
+```
+
+Add the dependency
+
+```groovy
+    dependencies {
+            compile 'com.github.championswimmer:Lifelog-Android-Libraryy:1.0'
+    }
+```
 
 
 ###Initialise
