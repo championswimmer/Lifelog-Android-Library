@@ -23,7 +23,7 @@ Add the dependency
 
 ```groovy
     dependencies {
-            compile 'com.github.championswimmer:Lifelog-Android-Libraryy:1.0'
+            compile 'com.github.championswimmer:Lifelog-Android-Library:1.0'
     }
 ```
 
