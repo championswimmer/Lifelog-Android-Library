@@ -16,18 +16,12 @@ import android.webkit.WebViewClient;
 import com.sonymobile.lifelog.auth.GetAuthTokenTask;
 import com.sonymobile.lifelog.utils.Debug;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * Created by championswimmer on 21/4/15.
  */
 public class LoginActivity extends Activity {
     private static final String TAG = LoginActivity.class.getSimpleName();
     private static final Uri AUTH_BASE_URL = Uri.parse("https://platform.lifelog.sonymobile.com/oauth/2/authorize");
-
-    static Pattern AUTH_CODE_PATTERN = Pattern.compile("(code)" + "(=)" + "(.*)");
-    String authentication_code = "";
 
     private WebView mWebView;
 
@@ -46,13 +40,12 @@ public class LoginActivity extends Activity {
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if (url.contains(LifeLog.getCallback_url())) {
-                    Matcher m = AUTH_CODE_PATTERN.matcher(url);
-                    if (m.find()) {
+                if (url.startsWith(LifeLog.getCallback_url())) {
+                    final String authenticationCode = Uri.parse(url).getQueryParameter("code");
+                    if (!TextUtils.isEmpty(authenticationCode)) {
                         mWebView.setVisibility(View.GONE);
-                        authentication_code = m.group(3);
                         GetAuthTokenTask gat = new GetAuthTokenTask(getApplicationContext());
-                        gat.getAuth(authentication_code, new GetAuthTokenTask.OnAuthenticatedListener() {
+                        gat.getAuth(authenticationCode, new GetAuthTokenTask.OnAuthenticatedListener() {
                             @Override
                             public void onAuthenticated(String authToken) {
                                 LifeLog.auth_token = authToken;
