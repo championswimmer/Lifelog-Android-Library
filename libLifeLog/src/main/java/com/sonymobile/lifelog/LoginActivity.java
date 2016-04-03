@@ -1,6 +1,9 @@
 package com.sonymobile.lifelog;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.ProgressDialog;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,6 +26,8 @@ public class LoginActivity extends Activity {
     private static final String TAG = LoginActivity.class.getSimpleName();
     private static final Uri AUTH_BASE_URL = Uri.parse("https://platform.lifelog.sonymobile.com/oauth/2/authorize");
 
+    private static final String PROGRESS_DIALOG_TAG = "progress_dialog";
+
     private WebView mWebView;
 
     @Override
@@ -44,11 +49,18 @@ public class LoginActivity extends Activity {
                     final String authenticationCode = Uri.parse(url).getQueryParameter("code");
                     if (!TextUtils.isEmpty(authenticationCode)) {
                         mWebView.setVisibility(View.GONE);
+
+                        final DialogFragment dialog = new ProgressDialogFragment();
+                        dialog.show(getFragmentManager(), PROGRESS_DIALOG_TAG);
+
                         GetAuthTokenTask gat = new GetAuthTokenTask(getApplicationContext());
                         gat.getAuth(authenticationCode, new GetAuthTokenTask.OnAuthenticatedListener() {
                             @Override
                             public void onAuthenticated(String authToken) {
                                 LifeLog.auth_token = authToken;
+
+                                dialog.dismiss();
+
                                 setResult(RESULT_OK);
                                 finish();
                             }
@@ -58,6 +70,9 @@ public class LoginActivity extends Activity {
                                 if (Debug.isDebuggable(LoginActivity.this)) {
                                     Log.w(TAG, "onError", e);
                                 }
+
+                                dialog.dismiss();
+
                                 setResult(RESULT_CANCELED);
                                 finish();
                             }
@@ -126,5 +141,16 @@ public class LoginActivity extends Activity {
     protected void onDestroy() {
         mWebView.destroy();
         super.onDestroy();
+    }
+
+    public static class ProgressDialogFragment extends DialogFragment {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            ProgressDialog dialog = new ProgressDialog(getActivity());
+            dialog.setMessage(getString(R.string.progress_dialog_message));
+            dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            setCancelable(false);
+            return dialog;
+        }
     }
 }
