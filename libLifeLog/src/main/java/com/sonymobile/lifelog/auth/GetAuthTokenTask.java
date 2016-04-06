@@ -8,6 +8,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.sonymobile.lifelog.LifeLog;
+import com.sonymobile.lifelog.utils.Debug;
 import com.sonymobile.lifelog.utils.SecurePreferences;
 import com.sonymobile.lifelog.utils.VolleySingleton;
 
@@ -21,18 +22,18 @@ import java.nio.charset.Charset;
  */
 public class GetAuthTokenTask {
 
-    public static final String TAG = "LifeLog:GetAuthToken";
-    public static final String OAUTH2_URL = "https://platform.lifelog.sonymobile.com/oauth/2/token";
+    private static final String TAG = "LifeLog:GetAuthToken";
+    private static final String OAUTH2_URL = "https://platform.lifelog.sonymobile.com/oauth/2/token";
     public static final String AUTH_ACCESS_TOKEN = "access_token";
-    public static final String AUTH_ISSUED_AT = "issued_at";
     public static final String AUTH_EXPIRES_IN = "expires_in";
-    public static final String AUTH_EXPIRES = "expires";
     public static final String AUTH_REFRESH_TOKEN = "refresh_token";
-    static String PARAM_CLIENT_ID = "client_id";
-    static String PARAM_CLIENT_SECRET = "client_secret";
-    static String PARAM_GRANT_TYPE = "grant_type";
-    static String PARAM_CODE = "code";
-    private Context mContext;
+    public static final String AUTH_TOKEN_TYPE = "token_type";
+    public static final String AUTH_REFRESH_TOKEN_EXPIRES_IN = "refresh_token_expires_in";
+    private final static String PARAM_CLIENT_ID = "client_id";
+    private final static String PARAM_CLIENT_SECRET = "client_secret";
+    private final static String PARAM_GRANT_TYPE = "grant_type";
+    private final static String PARAM_CODE = "code";
+    private final Context mContext;
     private OnAuthenticatedListener onAuthenticatedListener;
     public GetAuthTokenTask(Context context) {
         this.mContext = context;
@@ -58,17 +59,21 @@ public class GetAuthTokenTask {
                                     LifeLog.LIFELOG_PREFS, LifeLog.getClient_secret(), true);
                             spref.put(AUTH_ACCESS_TOKEN, jObj.getString(AUTH_ACCESS_TOKEN));
                             spref.put(AUTH_EXPIRES_IN, jObj.getString(AUTH_EXPIRES_IN));
-                            spref.put(AUTH_EXPIRES, jObj.getString(AUTH_EXPIRES));
-                            spref.put(AUTH_ISSUED_AT, jObj.getString(AUTH_ISSUED_AT));
+                            spref.put(AUTH_TOKEN_TYPE, jObj.getString(AUTH_TOKEN_TYPE));
                             spref.put(AUTH_REFRESH_TOKEN, jObj.getString(AUTH_REFRESH_TOKEN));
-                            Log.d(TAG, jObj.getString(AUTH_ACCESS_TOKEN));
-                            Log.d(TAG, jObj.getString(AUTH_EXPIRES));
-                            Log.d(TAG, jObj.getString(AUTH_REFRESH_TOKEN));
+                            spref.put(AUTH_REFRESH_TOKEN_EXPIRES_IN,
+                                      jObj.getString(AUTH_REFRESH_TOKEN_EXPIRES_IN));
+                            if (Debug.isDebuggable(mContext)) {
+                                Log.d(TAG, jObj.getString(AUTH_ACCESS_TOKEN));
+                                Log.d(TAG, jObj.getString(AUTH_REFRESH_TOKEN));
+                            }
                             if (onAuthenticatedListener != null) {
                                 onAuthenticatedListener.onAuthenticated(jObj.getString(AUTH_ACCESS_TOKEN));
                             }
                         } catch (JSONException e) {
-                            //TODO: handle malformed json
+                            if (onAuthenticatedListener != null) {
+                                onAuthenticatedListener.onError(e);
+                            }
                         }
 
                     }
@@ -76,7 +81,9 @@ public class GetAuthTokenTask {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
-
+                        if (onAuthenticatedListener != null) {
+                            onAuthenticatedListener.onError(volleyError);
+                        }
                     }
                 }
         ) {
@@ -95,7 +102,8 @@ public class GetAuthTokenTask {
     }
 
     public interface OnAuthenticatedListener {
-        void onAuthenticated(String auth_token);
+        void onAuthenticated(String authToken);
+        void onError(Exception e);
     }
 
 

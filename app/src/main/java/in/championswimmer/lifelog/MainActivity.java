@@ -55,9 +55,14 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == LifeLog.LOGINACTIVITY_REQUEST_CODE) {
-            Toast.makeText(this, "User authenticated", Toast.LENGTH_SHORT).show();
+            if (resultCode == RESULT_OK) {
+                Toast.makeText(this, "User authenticated", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "User authentication failed", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 

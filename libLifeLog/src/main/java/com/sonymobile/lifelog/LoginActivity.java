@@ -1,10 +1,14 @@
 package com.sonymobile.lifelog;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.ProgressDialog;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.webkit.WebChromeClient;
@@ -13,18 +17,16 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.sonymobile.lifelog.auth.GetAuthTokenTask;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.sonymobile.lifelog.utils.Debug;
 
 /**
  * Created by championswimmer on 21/4/15.
  */
 public class LoginActivity extends Activity {
+    private static final String TAG = LoginActivity.class.getSimpleName();
     private static final Uri AUTH_BASE_URL = Uri.parse("https://platform.lifelog.sonymobile.com/oauth/2/authorize");
 
-    static Pattern AUTH_CODE_PATTERN = Pattern.compile("(code)" + "(=)" + "(.*)");
-    String authentication_code = "";
+    private static final String PROGRESS_DIALOG_TAG = "progress_dialog";
 
     private WebView mWebView;
 
@@ -43,19 +45,36 @@ public class LoginActivity extends Activity {
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if (url.contains(LifeLog.getCallback_url())) {
-                    Matcher m = AUTH_CODE_PATTERN.matcher(url);
-                    if (m.find()) {
+                if (url.startsWith(LifeLog.getCallback_url())) {
+                    final String authenticationCode = Uri.parse(url).getQueryParameter("code");
+                    if (!TextUtils.isEmpty(authenticationCode)) {
                         mWebView.setVisibility(View.GONE);
-                        authentication_code = m.group(3);
-                        GetAuthTokenTask gat = new GetAuthTokenTask(getApplicationContext());
-                        gat.getAuth(authentication_code, new GetAuthTokenTask.OnAuthenticatedListener() {
-                            @Override
-                            public void onAuthenticated(String auth_token) {
-                                LifeLog.auth_token = auth_token;
-                                setResult(LifeLog.LOGINACTIVITY_REQUEST_CODE);
-                                finish();
 
+                        final DialogFragment dialog = new ProgressDialogFragment();
+                        dialog.show(getFragmentManager(), PROGRESS_DIALOG_TAG);
+
+                        GetAuthTokenTask gat = new GetAuthTokenTask(getApplicationContext());
+                        gat.getAuth(authenticationCode, new GetAuthTokenTask.OnAuthenticatedListener() {
+                            @Override
+                            public void onAuthenticated(String authToken) {
+                                LifeLog.auth_token = authToken;
+
+                                dialog.dismiss();
+
+                                setResult(RESULT_OK);
+                                finish();
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                if (Debug.isDebuggable(LoginActivity.this)) {
+                                    Log.w(TAG, "onError", e);
+                                }
+
+                                dialog.dismiss();
+
+                                setResult(RESULT_CANCELED);
+                                finish();
                             }
                         });
                     }
@@ -122,5 +141,16 @@ public class LoginActivity extends Activity {
     protected void onDestroy() {
         mWebView.destroy();
         super.onDestroy();
+    }
+
+    public static class ProgressDialogFragment extends DialogFragment {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            ProgressDialog dialog = new ProgressDialog(getActivity());
+            dialog.setMessage(getString(R.string.progress_dialog_message));
+            dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            setCancelable(false);
+            return dialog;
+        }
     }
 }
