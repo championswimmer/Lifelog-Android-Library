@@ -40,8 +40,7 @@ public class RefreshAuthTokenTask {
 
     public void refreshAuth(OnAuthenticatedListener oal) {
         onAuthenticatedListener = oal;
-        final SecurePreferences spref = new SecurePreferences(mContext,
-                LifeLog.LIFELOG_PREFS, LifeLog.getClient_secret(), true);
+        final SecurePreferences spref = LifeLog.getSecurePreference(mContext);
 
         final String refreshAuthBody =
                 PARAM_CLIENT_ID + "=" + LifeLog.getClient_id() + "&"

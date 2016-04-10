@@ -55,8 +55,7 @@ public class GetAuthTokenTask {
                     @Override
                     public void onResponse(JSONObject jObj) {
                         try {
-                            SecurePreferences spref = new SecurePreferences(mContext,
-                                    LifeLog.LIFELOG_PREFS, LifeLog.getClient_secret(), true);
+                            SecurePreferences spref = LifeLog.getSecurePreference(mContext);
                             spref.put(AUTH_ACCESS_TOKEN, jObj.getString(AUTH_ACCESS_TOKEN));
                             spref.put(AUTH_EXPIRES_IN, jObj.getString(AUTH_EXPIRES_IN));
                             spref.put(AUTH_TOKEN_TYPE, jObj.getString(AUTH_TOKEN_TYPE));

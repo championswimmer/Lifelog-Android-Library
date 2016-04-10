@@ -18,7 +18,8 @@ public class LifeLog {
 
     public static final String API_BASE_URL = "https://platform.lifelog.sonymobile.com";
 
-    public static final String LIFELOG_PREFS = "lifelog_prefs";
+    // file name of preference
+    private static final String LIFELOG_PREFS = "lifelog_prefs";
     static String client_id = "";
     static String client_secret = "";
     static String login_scope = "";
@@ -63,6 +64,10 @@ public class LifeLog {
         }
     }
 
+    public static SecurePreferences getSecurePreference(Context context) {
+        return new SecurePreferences(context, LifeLog.LIFELOG_PREFS, LifeLog.getClient_secret(), true);
+    }
+
     /**
      * Initiate login operation with {@link com.sonymobile.lifelog.LifeLog#LOGINACTIVITY_REQUEST_CODE},
      * callback will be delivered to {@link Activity#onActivityResult(int, int, Intent)}.
@@ -73,12 +78,7 @@ public class LifeLog {
     }
 
     public static void checkAuthentication (Context context, final OnAuthenticationChecked oac) {
-        SecurePreferences securePreferences = new SecurePreferences(
-                context,
-                LIFELOG_PREFS,
-                getClient_secret(),
-                true
-        );
+        SecurePreferences securePreferences = getSecurePreference(context);
         if (securePreferences.containsKey(GetAuthTokenTask.AUTH_ACCESS_TOKEN)) {
             auth_token = securePreferences.getString(GetAuthTokenTask.AUTH_ACCESS_TOKEN);
             long expires_in = Long.valueOf(securePreferences.getString(GetAuthTokenTask.AUTH_EXPIRES_IN));
