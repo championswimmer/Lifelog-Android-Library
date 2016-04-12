@@ -3,6 +3,7 @@ package com.sonymobile.lifelog;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.sonymobile.lifelog.auth.GetAuthTokenTask;
@@ -24,7 +25,6 @@ public class LifeLog {
     static String client_secret = "";
     static String login_scope = "";
     static String callback_url = "";
-    static String auth_token = "";
 
     public static String getClient_id() {
         return client_id;
@@ -38,8 +38,10 @@ public class LifeLog {
         return callback_url;
     }
 
-    public static String getAuth_token() {
-        return auth_token;
+    @Nullable
+    public static String getAuthToken(Context context) {
+        SecurePreferences preference = getSecurePreference(context);
+        return preference.getString(GetAuthTokenTask.AUTH_ACCESS_TOKEN);
     }
 
     public static void initialise(String id, String secret, String callbackUrl) {
@@ -80,7 +82,6 @@ public class LifeLog {
     public static void checkAuthentication (Context context, final OnAuthenticationChecked oac) {
         SecurePreferences securePreferences = getSecurePreference(context);
         if (securePreferences.containsKey(GetAuthTokenTask.AUTH_ACCESS_TOKEN)) {
-            auth_token = securePreferences.getString(GetAuthTokenTask.AUTH_ACCESS_TOKEN);
             long expires_in = Long.valueOf(securePreferences.getString(GetAuthTokenTask.AUTH_EXPIRES_IN));
             if (expires_in > 120) {
                 oac.onAuthChecked(true);
@@ -89,7 +90,6 @@ public class LifeLog {
                 ratt.refreshAuth(new RefreshAuthTokenTask.OnAuthenticatedListener() {
                     @Override
                     public void onAuthenticated(String token) {
-                        auth_token = token;
                         oac.onAuthChecked(true);
                     }
                 });

@@ -57,8 +57,6 @@ public class LoginActivity extends Activity {
                         gat.getAuth(authenticationCode, new GetAuthTokenTask.OnAuthenticatedListener() {
                             @Override
                             public void onAuthenticated(String authToken) {
-                                LifeLog.auth_token = authToken;
-
                                 dialog.dismiss();
 
                                 setResult(RESULT_OK);
