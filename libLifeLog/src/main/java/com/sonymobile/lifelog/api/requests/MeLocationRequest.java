@@ -10,6 +10,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.sonymobile.lifelog.LifeLog;
 import com.sonymobile.lifelog.api.models.MeLocation;
+import com.sonymobile.lifelog.utils.Debug;
 import com.sonymobile.lifelog.utils.ISO8601Date;
 import com.sonymobile.lifelog.utils.VolleySingleton;
 
@@ -53,7 +54,9 @@ public class MeLocationRequest {
 
     public void get(Context context, final OnLocationFetched olf) {
         final Context appContext = context.getApplicationContext();
-        Log.v(TAG, "get called");
+        if (Debug.isDebuggable(appContext)) {
+            Log.v(TAG, "get called");
+        }
         final ArrayList<MeLocation> locations = new ArrayList<>(limit);
         LifeLog.checkAuthentication(appContext, new LifeLog.OnAuthenticationChecked() {
             @Override
@@ -80,7 +83,9 @@ public class MeLocationRequest {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject) {
-                        Log.v(TAG, jsonObject.toString());
+                        if (Debug.isDebuggable(appContext)) {
+                            Log.v(TAG, jsonObject.toString());
+                        }
                         try {
                             if (jsonObject.has("error")) {
                                 if (jsonObject.getJSONObject("error").getString("code").contains("401")) {
@@ -94,7 +99,9 @@ public class MeLocationRequest {
                                 }
                             }
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            if (Debug.isDebuggable(appContext)) {
+                                Log.w(TAG, "Exception", e);
+                            }
                         }
 
                         try {
@@ -105,7 +112,9 @@ public class MeLocationRequest {
                             olf.onLocationFetched(locations);
                             lastLocationRequest = null;
                         } catch (JSONException e) {
-                            e.printStackTrace();
+                            if (Debug.isDebuggable(appContext)) {
+                                Log.w(TAG, "JSONException", e);
+                            }
                         }
 
 
@@ -114,7 +123,9 @@ public class MeLocationRequest {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
-
+                        if (Debug.isDebuggable(appContext)) {
+                            Log.w(TAG, "VolleyError: " + new String(volleyError.networkResponse.data), volleyError);
+                        }
                     }
                 }
         ) {
