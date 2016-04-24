@@ -37,7 +37,7 @@ public class GetAuthTokenTask {
     private OnAuthenticatedListener onAuthenticatedListener;
 
     public GetAuthTokenTask(Context context) {
-        this.mContext = context;
+        this.mContext = context.getApplicationContext();
     }
 
     public void getAuth(final String authCode, OnAuthenticatedListener oal) {

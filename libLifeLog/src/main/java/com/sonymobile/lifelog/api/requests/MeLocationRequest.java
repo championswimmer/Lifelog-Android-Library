@@ -51,13 +51,14 @@ public class MeLocationRequest {
         return prepareRequest(null, null, lim);
     }
 
-    public void get(final Context context, final OnLocationFetched olf) {
+    public void get(Context context, final OnLocationFetched olf) {
+        final Context appContext = context.getApplicationContext();
         Log.v(TAG, "get called");
         final ArrayList<MeLocation> locations = new ArrayList<>(limit);
-        LifeLog.checkAuthentication(context, new LifeLog.OnAuthenticationChecked() {
+        LifeLog.checkAuthentication(appContext, new LifeLog.OnAuthenticationChecked() {
             @Override
             public void onAuthChecked(boolean authenticated) {
-                authToken = LifeLog.getAuthToken(context);
+                authToken = LifeLog.getAuthToken(appContext);
             }
         });
         String requestUrl = API_URL;
@@ -83,11 +84,11 @@ public class MeLocationRequest {
                         try {
                             if (jsonObject.has("error")) {
                                 if (jsonObject.getJSONObject("error").getString("code").contains("401")) {
-                                    LifeLog.checkAuthentication(context, new LifeLog.OnAuthenticationChecked() {
+                                    LifeLog.checkAuthentication(appContext, new LifeLog.OnAuthenticationChecked() {
                                         @Override
                                         public void onAuthChecked(boolean authenticated) {
                                             if (authenticated && (lastLocationRequest != null))
-                                                VolleySingleton.getInstance(context).addToRequestQueue(lastLocationRequest);
+                                                VolleySingleton.getInstance(appContext).addToRequestQueue(lastLocationRequest);
                                         }
                                     });
                                 }
@@ -128,7 +129,7 @@ public class MeLocationRequest {
             }
         };
         lastLocationRequest = locationRequest;
-        VolleySingleton.getInstance(context).addToRequestQueue(locationRequest);
+        VolleySingleton.getInstance(appContext).addToRequestQueue(locationRequest);
     }
 
     public interface OnLocationFetched {
