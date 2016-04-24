@@ -35,7 +35,7 @@ public class RefreshAuthTokenTask {
     private Context mContext;
     private OnAuthenticatedListener onAuthenticatedListener;
     public RefreshAuthTokenTask(Context context) {
-        this.mContext = context;
+        this.mContext = context.getApplicationContext();
     }
 
     public void refreshAuth(OnAuthenticatedListener oal) {
