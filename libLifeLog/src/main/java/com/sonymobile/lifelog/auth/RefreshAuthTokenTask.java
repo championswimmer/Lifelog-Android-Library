@@ -8,6 +8,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.sonymobile.lifelog.LifeLog;
+import com.sonymobile.lifelog.utils.Debug;
 import com.sonymobile.lifelog.utils.SecurePreferences;
 import com.sonymobile.lifelog.utils.VolleySingleton;
 
@@ -70,6 +71,9 @@ public class RefreshAuthTokenTask {
                                 onAuthenticatedListener.onAuthenticated(jObj.getString(AUTH_ACCESS_TOKEN));
                             }
                         } catch (JSONException e) {
+                            if (Debug.isDebuggable(mContext)) {
+                                Log.w(TAG, "JSONException", e);
+                            }
                             //TODO: handle malformed json
                         }
 
