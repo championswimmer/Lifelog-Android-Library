@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.sonymobile.lifelog.LifeLog;
 import com.sonymobile.lifelog.api.LifeLogLocationAPI;
+import com.sonymobile.lifelog.utils.SecurePreferences;
 
 import java.util.ArrayList;
 
@@ -25,11 +26,20 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button b = (Button) findViewById(R.id.login_button);
-        b.setOnClickListener(new View.OnClickListener() {
+        Button login = (Button) findViewById(R.id.login_button);
+        login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 LifeLog.doLogin(MainActivity.this);
+            }
+        });
+
+        Button logout = (Button) findViewById(R.id.logout_button);
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SecurePreferences preferences = LifeLog.getSecurePreference(MainActivity.this);
+                preferences.clear();
             }
         });
 

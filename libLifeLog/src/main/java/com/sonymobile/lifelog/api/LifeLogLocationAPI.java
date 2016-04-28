@@ -65,7 +65,7 @@ public class LifeLogLocationAPI {
         LifeLog.checkAuthentication(context, new LifeLog.OnAuthenticationChecked() {
             @Override
             public void onAuthChecked(boolean authenticated) {
-                authToken = LifeLog.getAuth_token();
+                authToken = LifeLog.getAuthToken(context);
             }
         });
         String requestUrl = LOCATION_BASE_URL;
