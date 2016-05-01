@@ -3,7 +3,7 @@ This is an Android (not pure java) wrapper for the [LifeLog Web API](https://dev
 
 [![Book session on Codementor](https://cdn.codementor.io/badges/book_session_github.svg)](https://www.codementor.io/championswimmer?utm_source=github&utm_medium=button&utm_term=championswimmer&utm_campaign=github)
 
-[![Release](https://jitpack.io/v/in.championswimmer/Lifelog-Android-Library.svg?label=maven)](https://jitpack.io/#in.championswimmer/Lifelog-Android-Library)
+[![Release](https://jitpack.io/v/in.championswimmer/Lifelog-Android-Library.svg)](https://jitpack.io/#in.championswimmer/Lifelog-Android-Library)
 
 ### How to add to your project
 
