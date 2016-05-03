@@ -15,6 +15,7 @@ import com.sonymobile.lifelog.api.LifeLogLocationAPI;
 import com.sonymobile.lifelog.utils.SecurePreferences;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -43,22 +44,21 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        LifeLog.checkAuthentication(this, new LifeLog.OnAuthenticationChecked() {
+        Button history = (Button) findViewById(R.id.location_history_button);
+        history.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onAuthChecked(boolean authenticated) {
-                if (authenticated) {
-                    Toast.makeText(MainActivity.this, "authed", Toast.LENGTH_SHORT).show();
-                    LifeLogLocationAPI llLocation = LifeLogLocationAPI.prepareRequest(500);
-                    llLocation.get(MainActivity.this, new LifeLogLocationAPI.OnLocationFetched() {
-                        @Override
-                        public void onLocationFetched(ArrayList<LifeLogLocationAPI.LifeLogLocation> locations) {
-                            Log.d(TAG, locations.get(0).getId());
-
+            public void onClick(View v) {
+                LifeLogLocationAPI locationAPI = LifeLogLocationAPI.prepareRequest(null, Calendar.getInstance(), 10);
+                locationAPI.get(MainActivity.this, new LifeLogLocationAPI.OnLocationFetched() {
+                    @Override
+                    public void onLocationFetched(ArrayList<LifeLogLocationAPI.LifeLogLocation> locations) {
+                        for (LifeLogLocationAPI.LifeLogLocation location : locations) {
+                            Log.d(TAG, "ID: " + location.getId() + " lat: " + location.getLatitude()
+                                    + " lon: " + location.getLongitude());
                         }
-                    });
-                } else {
-                    //LifeLog.doLogin(MainActivity.this);
-                }
+                    }
+                });
+
             }
         });
     }
