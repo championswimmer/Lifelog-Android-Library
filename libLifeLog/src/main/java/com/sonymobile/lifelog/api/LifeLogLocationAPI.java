@@ -29,37 +29,34 @@ import java.util.Map;
  * Created by championswimmer on 21/4/15.
  */
 public class LifeLogLocationAPI {
-
-    public static final String TAG = "LifeLog:LocationAPI";
-
+    private static final String TAG = "LifeLog:LocationAPI";
 
     public interface OnLocationFetched {
         void onLocationFetched (ArrayList<LifeLogLocation> locations);
     }
 
+    private String startTime, endTime;
+    private int limit;
+    private String authToken;
 
-    String startTime, endTime;
-    Integer limit;
-    String authToken;
-
-    static JsonObjectRequest lastLocationRequest;
+    private static JsonObjectRequest lastLocationRequest;
 
     private static final Uri LOCATION_BASE_URL =
             Uri.parse(LifeLog.API_BASE_URL).buildUpon().appendEncodedPath("/v1/users/me/locations").build();
 
-    public LifeLogLocationAPI(Calendar start, Calendar end, Integer lim) {
+    public LifeLogLocationAPI(Calendar start, Calendar end, int lim) {
         if (start != null) startTime = ISO8601Date.fromCalendar(start);
         if (end != null) endTime = ISO8601Date.fromCalendar(end);
         limit = lim;
     }
 
-    public static LifeLogLocationAPI prepareRequest(Calendar start, Calendar end, Integer lim) {
-        if (lim==null || lim > 500) {
+    public static LifeLogLocationAPI prepareRequest(Calendar start, Calendar end, int lim) {
+        if (lim > 500) {
             lim = 500;
         }
         return new LifeLogLocationAPI(start, end, lim);
     }
-    public static LifeLogLocationAPI prepareRequest(Integer lim) {
+    public static LifeLogLocationAPI prepareRequest(int lim) {
         return prepareRequest(null, null, lim);
     }
 
