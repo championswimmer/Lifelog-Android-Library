@@ -1,6 +1,8 @@
 package com.sonymobile.lifelog.api;
 
 import android.content.Context;
+import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
@@ -42,7 +44,8 @@ public class LifeLogLocationAPI {
 
     static JsonObjectRequest lastLocationRequest;
 
-    static String LOCATION_BASE_URL = LifeLog.API_BASE_URL + "/v1/users/me/locations";
+    private static final Uri LOCATION_BASE_URL =
+            Uri.parse(LifeLog.API_BASE_URL).buildUpon().appendEncodedPath("/v1/users/me/locations").build();
 
     public LifeLogLocationAPI(Calendar start, Calendar end, Integer lim) {
         if (start != null) startTime = ISO8601Date.fromCalendar(start);
@@ -72,22 +75,20 @@ public class LifeLogLocationAPI {
                 authToken = LifeLog.getAuthToken(appContext);
             }
         });
-        String requestUrl = LOCATION_BASE_URL;
-        String params = "";
-        if (startTime != null) {
-            params += "start_time="+startTime;
+
+        Uri.Builder uriBuilder = LOCATION_BASE_URL.buildUpon();
+        if (!TextUtils.isEmpty(startTime)) {
+            uriBuilder.appendQueryParameter("start_time", startTime);
         }
-        if (endTime != null) {
-            params += "end_time="+endTime;
+        if (!TextUtils.isEmpty(endTime)) {
+            uriBuilder.appendQueryParameter("end_time", endTime);
         }
-        if (limit != null) {
-            params += "limit="+limit;
+        if (limit > 0) {
+            uriBuilder.appendQueryParameter("limit", String.valueOf(limit));
         }
-        if (params.length() > 1) {
-            requestUrl += "?" + params;
-        }
+
         final JsonObjectRequest locationRequest = new JsonObjectRequest(Request.Method.GET,
-                requestUrl, (JSONObject) null,
+                uriBuilder.toString(), (JSONObject) null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject) {
