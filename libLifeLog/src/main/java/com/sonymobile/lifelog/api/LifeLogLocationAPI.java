@@ -37,7 +37,6 @@ public class LifeLogLocationAPI {
 
     private String startTime, endTime;
     private int limit;
-    private String authToken;
 
     private static JsonObjectRequest lastLocationRequest;
 
@@ -65,13 +64,18 @@ public class LifeLogLocationAPI {
         if (Debug.isDebuggable(appContext)) {
             Log.v(TAG, "get called");
         }
-        final ArrayList<LifeLogLocation> locations = new ArrayList<>(limit);
         LifeLog.checkAuthentication(appContext, new LifeLog.OnAuthenticationChecked() {
             @Override
             public void onAuthChecked(boolean authenticated) {
-                authToken = LifeLog.getAuthToken(appContext);
+                if (authenticated) {
+                    callLocationApi(appContext, olf);
+                }
             }
         });
+    }
+
+    private void callLocationApi(final Context context, final OnLocationFetched olf) {
+        final String authToken = LifeLog.getAuthToken(context);
 
         Uri.Builder uriBuilder = LOCATION_BASE_URL.buildUpon();
         if (!TextUtils.isEmpty(startTime)) {
@@ -89,28 +93,29 @@ public class LifeLogLocationAPI {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject) {
-                        if (Debug.isDebuggable(appContext)) {
+                        if (Debug.isDebuggable(context)) {
                             Log.v(TAG, jsonObject.toString());
                         }
                         try {
                             if (jsonObject.has("error")) {
                                 if (jsonObject.getJSONObject("error").getString("code").contains("401")) {
-                                    LifeLog.checkAuthentication(appContext, new LifeLog.OnAuthenticationChecked() {
+                                    LifeLog.checkAuthentication(context, new LifeLog.OnAuthenticationChecked() {
                                         @Override
                                         public void onAuthChecked(boolean authenticated) {
                                             if (authenticated && (lastLocationRequest != null))
-                                                VolleySingleton.getInstance(appContext).addToRequestQueue(lastLocationRequest);
+                                                VolleySingleton.getInstance(context).addToRequestQueue(lastLocationRequest);
                                         }
                                     });
                                 }
                             }
                         } catch (Exception e) {
-                            if (Debug.isDebuggable(appContext)) {
+                            if (Debug.isDebuggable(context)) {
                                 Log.w(TAG, "Exception", e);
                             }
                         }
 
                         try {
+                            final ArrayList<LifeLogLocation> locations = new ArrayList<>(limit);
                             JSONArray resultArray = jsonObject.getJSONArray("result");
                             for (int i = 0; i < resultArray.length(); i++) {
                                     locations.add(new LifeLogLocation(resultArray.getJSONObject(i)));
@@ -118,7 +123,7 @@ public class LifeLogLocationAPI {
                             olf.onLocationFetched(locations);
                             lastLocationRequest = null;
                         } catch (JSONException e) {
-                            if (Debug.isDebuggable(appContext)) {
+                            if (Debug.isDebuggable(context)) {
                                 Log.w(TAG, "JSONException", e);
                             }
                         }
@@ -129,7 +134,7 @@ public class LifeLogLocationAPI {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
-                        if (Debug.isDebuggable(appContext)) {
+                        if (Debug.isDebuggable(context)) {
                             Log.w(TAG, "VolleyError: " + new String(volleyError.networkResponse.data), volleyError);
                         }
                     }
@@ -146,7 +151,7 @@ public class LifeLogLocationAPI {
             }
         };
         lastLocationRequest = locationRequest;
-        VolleySingleton.getInstance(appContext).addToRequestQueue(locationRequest);
+        VolleySingleton.getInstance(context).addToRequestQueue(locationRequest);
     }
 
     public static class LifeLogLocation {
