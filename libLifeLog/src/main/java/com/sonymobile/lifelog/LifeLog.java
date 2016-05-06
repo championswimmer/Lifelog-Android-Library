@@ -79,11 +79,20 @@ public class LifeLog {
         activity.startActivityForResult(loginIntent, LOGINACTIVITY_REQUEST_CODE);
     }
 
+    /**
+     * Refresh access token if it is about to expire
+     */
     public static void checkAuthentication(Context context, final OnAuthenticationChecked oac) {
+        context = context.getApplicationContext();
         SecurePreferences securePreferences = getSecurePreference(context);
         if (securePreferences.containsKey(GetAuthTokenTask.AUTH_ACCESS_TOKEN)) {
-            long expires_in = Long.valueOf(securePreferences.getString(GetAuthTokenTask.AUTH_EXPIRES_IN));
-            if (expires_in > 120) {
+            long expiresIn = Long
+                    .valueOf(securePreferences.getString(GetAuthTokenTask.AUTH_EXPIRES_IN));
+            long issueAt = Long
+                    .valueOf(securePreferences.getString(GetAuthTokenTask.AUTH_ISSUE_AT));
+
+            // if access token expires in next 2 minutes
+            if (issueAt + expiresIn - System.currentTimeMillis() / 1000 > 120) {
                 oac.onAuthChecked(true);
             } else {
                 RefreshAuthTokenTask ratt = new RefreshAuthTokenTask(context);
