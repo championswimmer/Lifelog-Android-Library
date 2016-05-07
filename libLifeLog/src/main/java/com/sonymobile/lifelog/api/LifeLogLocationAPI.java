@@ -2,6 +2,7 @@ package com.sonymobile.lifelog.api;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -41,7 +42,7 @@ public class LifeLogLocationAPI {
     private static final Uri LOCATION_BASE_URL =
             Uri.parse(LifeLog.API_BASE_URL).buildUpon().appendEncodedPath("/v1/users/me/locations").build();
 
-    public LifeLogLocationAPI(Calendar start, Calendar end, int lim) {
+    public LifeLogLocationAPI(@Nullable Calendar start, @Nullable Calendar end, int lim) {
         if (start != null) startTime = ISO8601Date.fromCalendar(start);
         if (end != null) endTime = ISO8601Date.fromCalendar(end);
         limit = lim;
