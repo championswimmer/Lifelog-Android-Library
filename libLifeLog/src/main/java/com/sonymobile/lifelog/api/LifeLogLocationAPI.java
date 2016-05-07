@@ -121,11 +121,12 @@ public class LifeLogLocationAPI {
         ) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headerMap = new HashMap<>(5);
+                Map<String, String> originalHeader = super.getHeaders();
+                Map<String, String> headerMap = new HashMap<>();
+                headerMap.putAll(originalHeader);
+
                 headerMap.put("Authorization", "Bearer " + authToken);
                 headerMap.put("Accept", "application/json");
-                //headerMap.put("Accept-Encoding", "gzip");
-                //headerMap.put("Content-Encoding", "gzip");
                 return headerMap;
             }
         };
