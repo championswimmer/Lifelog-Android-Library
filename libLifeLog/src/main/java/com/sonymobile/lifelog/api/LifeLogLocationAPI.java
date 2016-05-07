@@ -1,6 +1,9 @@
 package com.sonymobile.lifelog.api;
 
 import android.content.Context;
+import android.net.Uri;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
@@ -9,6 +12,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.sonymobile.lifelog.LifeLog;
+import com.sonymobile.lifelog.utils.Debug;
 import com.sonymobile.lifelog.utils.ISO8601Date;
 import com.sonymobile.lifelog.utils.VolleySingleton;
 
@@ -26,116 +30,107 @@ import java.util.Map;
  * Created by championswimmer on 21/4/15.
  */
 public class LifeLogLocationAPI {
-
-    public static final String TAG = "LifeLog:LocationAPI";
-
+    private static final String TAG = "LifeLog:LocationAPI";
 
     public interface OnLocationFetched {
         void onLocationFetched (ArrayList<LifeLogLocation> locations);
     }
 
+    private String startTime, endTime;
+    private int limit;
 
-    String startTime, endTime;
-    Integer limit;
-    String authToken;
+    private static final Uri LOCATION_BASE_URL =
+            Uri.parse(LifeLog.API_BASE_URL).buildUpon().appendEncodedPath("/v1/users/me/locations").build();
 
-    static JsonObjectRequest lastLocationRequest;
-
-    static String LOCATION_BASE_URL = LifeLog.API_BASE_URL + "/v1/users/me/locations";
-
-    public LifeLogLocationAPI(Calendar start, Calendar end, Integer lim) {
+    public LifeLogLocationAPI(@Nullable Calendar start, @Nullable Calendar end, int lim) {
         if (start != null) startTime = ISO8601Date.fromCalendar(start);
         if (end != null) endTime = ISO8601Date.fromCalendar(end);
         limit = lim;
     }
 
-    public static LifeLogLocationAPI prepareRequest(Calendar start, Calendar end, Integer lim) {
-        if (lim==null || lim > 500) {
+    public static LifeLogLocationAPI prepareRequest(Calendar start, Calendar end, int lim) {
+        if (lim > 500) {
             lim = 500;
         }
         return new LifeLogLocationAPI(start, end, lim);
     }
-    public static LifeLogLocationAPI prepareRequest(Integer lim) {
+    public static LifeLogLocationAPI prepareRequest(int lim) {
         return prepareRequest(null, null, lim);
     }
 
-    public void get(final Context context, final OnLocationFetched olf) {
-        Log.v(TAG, "get called");
-        final ArrayList<LifeLogLocation> locations = new ArrayList<>(limit);
-        LifeLog.checkAuthentication(context, new LifeLog.OnAuthenticationChecked() {
+    public void get(Context context, final OnLocationFetched olf) {
+        final Context appContext = context.getApplicationContext();
+        if (Debug.isDebuggable(appContext)) {
+            Log.v(TAG, "get called");
+        }
+        LifeLog.checkAuthentication(appContext, new LifeLog.OnAuthenticationChecked() {
             @Override
             public void onAuthChecked(boolean authenticated) {
-                authToken = LifeLog.getAuthToken(context);
+                if (authenticated) {
+                    callLocationApi(appContext, olf);
+                }
             }
         });
-        String requestUrl = LOCATION_BASE_URL;
-        String params = "";
-        if (startTime != null) {
-            params += "start_time="+startTime;
+    }
+
+    private void callLocationApi(final Context context, final OnLocationFetched olf) {
+        final String authToken = LifeLog.getAuthToken(context);
+
+        Uri.Builder uriBuilder = LOCATION_BASE_URL.buildUpon();
+        if (!TextUtils.isEmpty(startTime)) {
+            uriBuilder.appendQueryParameter("start_time", startTime);
         }
-        if (endTime != null) {
-            params += "end_time="+endTime;
+        if (!TextUtils.isEmpty(endTime)) {
+            uriBuilder.appendQueryParameter("end_time", endTime);
         }
-        if (limit != null) {
-            params += "limit="+limit;
+        if (limit > 0) {
+            uriBuilder.appendQueryParameter("limit", String.valueOf(limit));
         }
-        if (params.length() > 1) {
-            requestUrl += "?" + params;
-        }
+
         final JsonObjectRequest locationRequest = new JsonObjectRequest(Request.Method.GET,
-                requestUrl, (JSONObject) null,
+                uriBuilder.toString(), (JSONObject) null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject) {
-                        Log.v(TAG, jsonObject.toString());
-                        try {
-                            if (jsonObject.has("error")) {
-                                if (jsonObject.getJSONObject("error").getString("code").contains("401")) {
-                                    LifeLog.checkAuthentication(context, new LifeLog.OnAuthenticationChecked() {
-                                        @Override
-                                        public void onAuthChecked(boolean authenticated) {
-                                            if (authenticated && (lastLocationRequest != null))
-                                                VolleySingleton.getInstance(context).addToRequestQueue(lastLocationRequest);
-                                        }
-                                    });
-                                }
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                        if (Debug.isDebuggable(context)) {
+                            Log.v(TAG, jsonObject.toString());
                         }
 
                         try {
+                            final ArrayList<LifeLogLocation> locations = new ArrayList<>(limit);
                             JSONArray resultArray = jsonObject.getJSONArray("result");
                             for (int i = 0; i < resultArray.length(); i++) {
                                     locations.add(new LifeLogLocation(resultArray.getJSONObject(i)));
                             }
                             olf.onLocationFetched(locations);
-                            lastLocationRequest = null;
                         } catch (JSONException e) {
-                            e.printStackTrace();
+                            if (Debug.isDebuggable(context)) {
+                                Log.w(TAG, "JSONException", e);
+                            }
                         }
-
 
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
-
+                        if (Debug.isDebuggable(context)) {
+                            Log.w(TAG, "VolleyError: " + new String(volleyError.networkResponse.data), volleyError);
+                        }
                     }
                 }
         ) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headerMap = new HashMap<>(5);
+                Map<String, String> originalHeader = super.getHeaders();
+                Map<String, String> headerMap = new HashMap<>();
+                headerMap.putAll(originalHeader);
+
                 headerMap.put("Authorization", "Bearer " + authToken);
                 headerMap.put("Accept", "application/json");
-                //headerMap.put("Accept-Encoding", "gzip");
-                //headerMap.put("Content-Encoding", "gzip");
                 return headerMap;
             }
         };
-        lastLocationRequest = locationRequest;
         VolleySingleton.getInstance(context).addToRequestQueue(locationRequest);
     }
 

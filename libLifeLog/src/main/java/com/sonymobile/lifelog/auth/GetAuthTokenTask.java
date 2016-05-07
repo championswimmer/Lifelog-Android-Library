@@ -26,6 +26,7 @@ public class GetAuthTokenTask {
     private static final String OAUTH2_URL = "https://platform.lifelog.sonymobile.com/oauth/2/token";
     public static final String AUTH_ACCESS_TOKEN = "access_token";
     public static final String AUTH_EXPIRES_IN = "expires_in";
+    public static final String AUTH_ISSUE_AT = "issue_at";
     public static final String AUTH_REFRESH_TOKEN = "refresh_token";
     public static final String AUTH_TOKEN_TYPE = "token_type";
     public static final String AUTH_REFRESH_TOKEN_EXPIRES_IN = "refresh_token_expires_in";
@@ -36,7 +37,7 @@ public class GetAuthTokenTask {
     private final Context mContext;
     private OnAuthenticatedListener onAuthenticatedListener;
     public GetAuthTokenTask(Context context) {
-        this.mContext = context;
+        this.mContext = context.getApplicationContext();
     }
 
     public void getAuth(final String authCode, OnAuthenticatedListener oal) {
@@ -57,6 +58,7 @@ public class GetAuthTokenTask {
                         try {
                             SecurePreferences spref = LifeLog.getSecurePreference(mContext);
                             spref.put(AUTH_ACCESS_TOKEN, jObj.getString(AUTH_ACCESS_TOKEN));
+                            spref.put(AUTH_ISSUE_AT, String.valueOf(System.currentTimeMillis() / 1000));
                             spref.put(AUTH_EXPIRES_IN, jObj.getString(AUTH_EXPIRES_IN));
                             spref.put(AUTH_TOKEN_TYPE, jObj.getString(AUTH_TOKEN_TYPE));
                             spref.put(AUTH_REFRESH_TOKEN, jObj.getString(AUTH_REFRESH_TOKEN));

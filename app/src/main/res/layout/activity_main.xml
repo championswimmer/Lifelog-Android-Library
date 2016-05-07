@@ -21,4 +21,11 @@
         android:layout_below="@+id/login_button"
         android:text="LOGOUT" />
 
+    <Button
+        android:id="@+id/location_history_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/logout_button"
+        android:text="Location History" />
+
 </RelativeLayout>
