@@ -49,7 +49,9 @@ public class RefreshAuthTokenTask {
                         + PARAM_GRANT_TYPE + "=" + "refresh_token" + "&"
                         + PARAM_REFRESH_TOKEN + "=" + spref.getString(AUTH_REFRESH_TOKEN);
 
-        Log.d(TAG, refreshAuthBody);
+        if (Debug.isDebuggable(mContext)) {
+            Log.d(TAG, refreshAuthBody);
+        }
 
         JsonObjectRequest authRequest = new JsonObjectRequest(Request.Method.POST,
                 OAUTH2_URL,
@@ -57,6 +59,9 @@ public class RefreshAuthTokenTask {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jObj) {
+                        if (Debug.isDebuggable(mContext)) {
+                            Log.v(TAG, jObj.toString());
+                        }
                         try {
 
                             spref.put(AUTH_ACCESS_TOKEN, jObj.getString(AUTH_ACCESS_TOKEN));
@@ -64,9 +69,11 @@ public class RefreshAuthTokenTask {
                             spref.put(AUTH_EXPIRES, jObj.getString(AUTH_EXPIRES));
                             spref.put(AUTH_ISSUED_AT, jObj.getString(AUTH_ISSUED_AT));
                             spref.put(AUTH_REFRESH_TOKEN, jObj.getString(AUTH_REFRESH_TOKEN));
-                            Log.d(TAG, jObj.getString(AUTH_ACCESS_TOKEN));
-                            Log.d(TAG, jObj.getString(AUTH_EXPIRES));
-                            Log.d(TAG, jObj.getString(AUTH_REFRESH_TOKEN));
+                            if (Debug.isDebuggable(mContext)) {
+                                Log.d(TAG, jObj.getString(AUTH_ACCESS_TOKEN));
+                                Log.d(TAG, jObj.getString(AUTH_EXPIRES));
+                                Log.d(TAG, jObj.getString(AUTH_REFRESH_TOKEN));
+                            }
                             if (onAuthenticatedListener != null) {
                                 onAuthenticatedListener.onAuthenticated(jObj.getString(AUTH_ACCESS_TOKEN));
                             }
@@ -82,6 +89,9 @@ public class RefreshAuthTokenTask {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError volleyError) {
+                        if (Debug.isDebuggable(mContext)) {
+                            Log.w(TAG, "VolleyError: " + new String(volleyError.networkResponse.data), volleyError);
+                        }
 
                     }
                 }
