@@ -38,8 +38,6 @@ public class LifeLogLocationAPI {
     private String startTime, endTime;
     private int limit;
 
-    private static JsonObjectRequest lastLocationRequest;
-
     private static final Uri LOCATION_BASE_URL =
             Uri.parse(LifeLog.API_BASE_URL).buildUpon().appendEncodedPath("/v1/users/me/locations").build();
 
@@ -96,23 +94,6 @@ public class LifeLogLocationAPI {
                         if (Debug.isDebuggable(context)) {
                             Log.v(TAG, jsonObject.toString());
                         }
-                        try {
-                            if (jsonObject.has("error")) {
-                                if (jsonObject.getJSONObject("error").getString("code").contains("401")) {
-                                    LifeLog.checkAuthentication(context, new LifeLog.OnAuthenticationChecked() {
-                                        @Override
-                                        public void onAuthChecked(boolean authenticated) {
-                                            if (authenticated && (lastLocationRequest != null))
-                                                VolleySingleton.getInstance(context).addToRequestQueue(lastLocationRequest);
-                                        }
-                                    });
-                                }
-                            }
-                        } catch (Exception e) {
-                            if (Debug.isDebuggable(context)) {
-                                Log.w(TAG, "Exception", e);
-                            }
-                        }
 
                         try {
                             final ArrayList<LifeLogLocation> locations = new ArrayList<>(limit);
@@ -121,13 +102,11 @@ public class LifeLogLocationAPI {
                                     locations.add(new LifeLogLocation(resultArray.getJSONObject(i)));
                             }
                             olf.onLocationFetched(locations);
-                            lastLocationRequest = null;
                         } catch (JSONException e) {
                             if (Debug.isDebuggable(context)) {
                                 Log.w(TAG, "JSONException", e);
                             }
                         }
-
 
                     }
                 },
@@ -150,7 +129,6 @@ public class LifeLogLocationAPI {
                 return headerMap;
             }
         };
-        lastLocationRequest = locationRequest;
         VolleySingleton.getInstance(context).addToRequestQueue(locationRequest);
     }
 
