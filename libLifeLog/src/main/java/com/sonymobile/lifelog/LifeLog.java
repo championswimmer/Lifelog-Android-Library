@@ -17,7 +17,7 @@ public class LifeLog {
 
     public static final int LOGINACTIVITY_REQUEST_CODE = 2231;
 
-    public static final String API_BASE_URL = "https://platform.lifelog.sonymobile.com";
+    public static final String API_BASE_URL = "https://platform.lifelog.sonymobile.com/v1";
 
     // file name of preference
     private static final String LIFELOG_PREFS = "lifelog_prefs";

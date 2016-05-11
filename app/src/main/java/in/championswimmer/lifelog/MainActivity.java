@@ -11,7 +11,10 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.sonymobile.lifelog.LifeLog;
-import com.sonymobile.lifelog.api.LifeLogLocationAPI;
+import com.sonymobile.lifelog.api.models.Me;
+import com.sonymobile.lifelog.api.models.MeLocation;
+import com.sonymobile.lifelog.api.requests.MeLocationRequest;
+import com.sonymobile.lifelog.api.requests.MeRequest;
 import com.sonymobile.lifelog.utils.SecurePreferences;
 
 import java.util.ArrayList;
@@ -48,12 +51,20 @@ public class MainActivity extends ActionBarActivity {
             public void onAuthChecked(boolean authenticated) {
                 if (authenticated) {
                     Toast.makeText(MainActivity.this, "authed", Toast.LENGTH_SHORT).show();
-                    LifeLogLocationAPI llLocation = LifeLogLocationAPI.prepareRequest(500);
-                    llLocation.get(MainActivity.this, new LifeLogLocationAPI.OnLocationFetched() {
+                    MeLocationRequest llLocation = MeLocationRequest.prepareRequest(500);
+                    llLocation.get(MainActivity.this, new MeLocationRequest.OnLocationFetched() {
                         @Override
-                        public void onLocationFetched(ArrayList<LifeLogLocationAPI.LifeLogLocation> locations) {
+                        public void onLocationFetched(ArrayList<MeLocation> locations) {
                             Log.d(TAG, locations.get(0).getId());
 
+                        }
+                    });
+
+                    MeRequest meRequest = MeRequest.prepareRequest();
+                    meRequest.get(MainActivity.this, new MeRequest.OnMeFetched() {
+                        @Override
+                        public void onMeFetched(Me meData) {
+                            Log.d(TAG, "onMeFetched: " + meData.getUsername());
                         }
                     });
                 } else {
