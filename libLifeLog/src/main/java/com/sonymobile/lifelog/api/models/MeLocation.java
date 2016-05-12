@@ -21,6 +21,7 @@ public class MeLocation {
     positionClass position = new positionClass();
     int altitude = 0;
     int accuracy = 0;
+
     public MeLocation(JSONObject jobj) throws JSONException {
         id = jobj.getString("id");
         source = new sourceClass();

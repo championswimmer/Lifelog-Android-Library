@@ -22,10 +22,9 @@ import java.util.ArrayList;
 
 
 public class MainActivity extends ActionBarActivity {
+    public static final String TAG = "LifeLog:MainActivity";
     Button login;
     Button logout;
-
-    public static final String TAG = "LifeLog:MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

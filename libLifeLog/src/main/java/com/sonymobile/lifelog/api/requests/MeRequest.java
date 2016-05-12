@@ -9,7 +9,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.sonymobile.lifelog.LifeLog;
 import com.sonymobile.lifelog.api.models.Me;
 import com.sonymobile.lifelog.utils.VolleySingleton;
