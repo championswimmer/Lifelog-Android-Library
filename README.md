@@ -24,7 +24,7 @@ Add the dependency
 
 ```groovy
     dependencies {
-	        compile 'in.championswimmer:Lifelog-Android-Library:1.0'
+	        compile 'in.championswimmer:Lifelog-Android-Library:1.+'
 	}
 ```
 
@@ -86,7 +86,13 @@ Create an object of `MeRequest` using the static `MeRequest.prepareRequest` meth
 The data gets actually fetched when you call `get()`
 
 ```java
-
+MeRequest meRequest = MeRequest.prepareRequest();
+                    meRequest.get(MainActivity.this, new MeRequest.OnMeFetched() {
+                        @Override
+                        public void onMeFetched(Me meData) {
+                            Log.d(TAG, "onMeFetched: " + meData.getUsername());
+                        }
+                    });
 ```
 
 #### `locations` endpoint
