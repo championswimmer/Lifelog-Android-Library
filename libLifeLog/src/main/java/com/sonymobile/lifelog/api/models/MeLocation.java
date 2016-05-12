@@ -14,16 +14,13 @@ import java.util.Calendar;
  */
 public class MeLocation {
 
-    public static class sourceClass {
-        String name = "";
-        String type = "";
-        String id = "";
-    }
-    static class positionClass {
-        double latitude = 0;
-        double longitude = 0;
-    }
-
+    String id = "";
+    sourceClass source = new sourceClass();
+    String startTime = "";
+    String endTime = "";
+    positionClass position = new positionClass();
+    int altitude = 0;
+    int accuracy = 0;
     public MeLocation(JSONObject jobj) throws JSONException {
         id = jobj.getString("id");
         source = new sourceClass();
@@ -48,14 +45,6 @@ public class MeLocation {
 
     }
 
-    String id = "";
-    sourceClass source = new sourceClass();
-    String startTime = "";
-    String endTime = "";
-    positionClass position = new positionClass();
-    int altitude = 0;
-    int accuracy = 0;
-
     public String getId() {
         return id;
     }
@@ -75,15 +64,28 @@ public class MeLocation {
     public int getAltitude() {
         return altitude;
     }
+
     public double getLatitude() {
         return position.latitude;
     }
+
     public double getLongitude() {
         return position.longitude;
     }
 
     public int getAccuracy() {
         return accuracy;
+    }
+
+    public static class sourceClass {
+        String name = "";
+        String type = "";
+        String id = "";
+    }
+
+    static class positionClass {
+        double latitude = 0;
+        double longitude = 0;
     }
 
 }

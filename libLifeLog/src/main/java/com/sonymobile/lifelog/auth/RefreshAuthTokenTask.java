@@ -34,6 +34,7 @@ public class RefreshAuthTokenTask {
     static String PARAM_REFRESH_TOKEN = "refresh_token";
     private Context mContext;
     private OnAuthenticatedListener onAuthenticatedListener;
+
     public RefreshAuthTokenTask(Context context) {
         this.mContext = context;
     }

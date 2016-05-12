@@ -8,6 +8,8 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.sonymobile.lifelog.LifeLog;
 import com.sonymobile.lifelog.api.models.Me;
 import com.sonymobile.lifelog.utils.VolleySingleton;
@@ -25,18 +27,11 @@ import java.util.Map;
 public class MeRequest {
 
     public static final String TAG = "LifeLog:MeRequest";
-
+    static JsonObjectRequest lastMeRequest;
+    static String API_URL = LifeLog.API_BASE_URL + "/users/me";
     String authToken;
 
-
-    public interface OnMeFetched {
-        void onMeFetched(Me meData);
-    }
-
-    static JsonObjectRequest lastMeRequest;
-
-    static String API_URL = LifeLog.API_BASE_URL + "/users/me";
-
+    Gson gson;
 
     private MeRequest() {
 
@@ -46,10 +41,9 @@ public class MeRequest {
         return new MeRequest();
     }
 
-    public void get (final Context context, final OnMeFetched omf) {
+    public void get(final Context context, final OnMeFetched omf) {
         Log.v(TAG, "get called");
 
-        final Me meData = new Me();
         LifeLog.checkAuthentication(context, new LifeLog.OnAuthenticationChecked() {
             @Override
             public void onAuthChecked(boolean authenticated) {
@@ -84,7 +78,8 @@ public class MeRequest {
                             JSONArray resultArray = jsonObject.getJSONArray("result");
                             JSONObject meObject = resultArray.getJSONObject(0);
 
-                            meData.setUsername(meObject.getString("username"));
+                            gson = new Gson();
+                            Me meData = gson.fromJson(meObject.toString(), Me.class);
 
                             omf.onMeFetched(meData);
 
@@ -116,6 +111,10 @@ public class MeRequest {
         lastMeRequest = meRequest;
         VolleySingleton.getInstance(context).addToRequestQueue(meRequest);
 
+    }
+
+    public interface OnMeFetched {
+        void onMeFetched(Me meData);
     }
 
 

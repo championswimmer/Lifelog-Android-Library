@@ -28,20 +28,11 @@ import java.util.Map;
 public class MeLocationRequest {
 
     public static final String TAG = "LifeLog:LocationAPI";
-
-
-    public interface OnLocationFetched {
-        void onLocationFetched (ArrayList<MeLocation> locations);
-    }
-
-
+    static JsonObjectRequest lastLocationRequest;
+    static String API_URL = LifeLog.API_BASE_URL + "/users/me/locations";
     String startTime, endTime;
     Integer limit;
     String authToken;
-
-    static JsonObjectRequest lastLocationRequest;
-
-    static String API_URL = LifeLog.API_BASE_URL + "/users/me/locations";
 
     public MeLocationRequest(Calendar start, Calendar end, Integer lim) {
         if (start != null) startTime = ISO8601Date.fromCalendar(start);
@@ -50,11 +41,12 @@ public class MeLocationRequest {
     }
 
     public static MeLocationRequest prepareRequest(Calendar start, Calendar end, Integer lim) {
-        if (lim==null || lim > 500) {
+        if (lim == null || lim > 500) {
             lim = 500;
         }
         return new MeLocationRequest(start, end, lim);
     }
+
     public static MeLocationRequest prepareRequest(Integer lim) {
         return prepareRequest(null, null, lim);
     }
@@ -71,13 +63,13 @@ public class MeLocationRequest {
         String requestUrl = API_URL;
         String params = "";
         if (startTime != null) {
-            params += "start_time="+startTime;
+            params += "start_time=" + startTime;
         }
         if (endTime != null) {
-            params += "end_time="+endTime;
+            params += "end_time=" + endTime;
         }
         if (limit != null) {
-            params += "limit="+limit;
+            params += "limit=" + limit;
         }
         if (params.length() > 1) {
             requestUrl += "?" + params;
@@ -107,7 +99,7 @@ public class MeLocationRequest {
                         try {
                             JSONArray resultArray = jsonObject.getJSONArray("result");
                             for (int i = 0; i < resultArray.length(); i++) {
-                                    locations.add(new MeLocation(resultArray.getJSONObject(i)));
+                                locations.add(new MeLocation(resultArray.getJSONObject(i)));
                             }
                             olf.onLocationFetched(locations);
                             lastLocationRequest = null;
@@ -137,6 +129,10 @@ public class MeLocationRequest {
         };
         lastLocationRequest = locationRequest;
         VolleySingleton.getInstance(context).addToRequestQueue(locationRequest);
+    }
+
+    public interface OnLocationFetched {
+        void onLocationFetched(ArrayList<MeLocation> locations);
     }
 
 }

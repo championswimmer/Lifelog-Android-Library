@@ -79,7 +79,7 @@ public class LifeLog {
         activity.startActivityForResult(loginIntent, LOGINACTIVITY_REQUEST_CODE);
     }
 
-    public static void checkAuthentication (Context context, final OnAuthenticationChecked oac) {
+    public static void checkAuthentication(Context context, final OnAuthenticationChecked oac) {
         SecurePreferences securePreferences = getSecurePreference(context);
         if (securePreferences.containsKey(GetAuthTokenTask.AUTH_ACCESS_TOKEN)) {
             long expires_in = Long.valueOf(securePreferences.getString(GetAuthTokenTask.AUTH_EXPIRES_IN));
@@ -99,7 +99,7 @@ public class LifeLog {
     }
 
     public interface OnAuthenticationChecked {
-        void onAuthChecked (boolean authenticated);
+        void onAuthChecked(boolean authenticated);
     }
 
     public static class Scopes {

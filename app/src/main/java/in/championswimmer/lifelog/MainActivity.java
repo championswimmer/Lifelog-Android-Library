@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.sonymobile.lifelog.LifeLog;
 import com.sonymobile.lifelog.api.models.Me;
 import com.sonymobile.lifelog.api.models.MeLocation;
@@ -21,6 +22,8 @@ import java.util.ArrayList;
 
 
 public class MainActivity extends ActionBarActivity {
+    Button login;
+    Button logout;
 
     public static final String TAG = "LifeLog:MainActivity";
 
@@ -29,7 +32,9 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button login = (Button) findViewById(R.id.login_button);
+        final Gson gson = new Gson();
+
+        login = (Button) findViewById(R.id.login_button);
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -37,7 +42,7 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        Button logout = (Button) findViewById(R.id.logout_button);
+        logout = (Button) findViewById(R.id.logout_button);
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -50,6 +55,8 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onAuthChecked(boolean authenticated) {
                 if (authenticated) {
+                    login.setVisibility(View.VISIBLE);
+                    logout.setVisibility(View.GONE);
                     Toast.makeText(MainActivity.this, "authed", Toast.LENGTH_SHORT).show();
                     MeLocationRequest llLocation = MeLocationRequest.prepareRequest(500);
                     llLocation.get(MainActivity.this, new MeLocationRequest.OnLocationFetched() {
@@ -64,11 +71,13 @@ public class MainActivity extends ActionBarActivity {
                     meRequest.get(MainActivity.this, new MeRequest.OnMeFetched() {
                         @Override
                         public void onMeFetched(Me meData) {
-                            Log.d(TAG, "onMeFetched: " + meData.getUsername());
+                            Log.d(TAG, "onMeFetched: " + gson.toJson(meData));
                         }
                     });
                 } else {
                     //LifeLog.doLogin(MainActivity.this);
+                    logout.setVisibility(View.VISIBLE);
+                    login.setVisibility(View.GONE);
                 }
             }
         });
