@@ -23,8 +23,6 @@ import java.util.ArrayList;
 
 public class MainActivity extends ActionBarActivity {
     public static final String TAG = "LifeLog:MainActivity";
-    Button login;
-    Button logout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +31,7 @@ public class MainActivity extends ActionBarActivity {
 
         final Gson gson = new Gson();
 
-        login = (Button) findViewById(R.id.login_button);
+        final Button login = (Button) findViewById(R.id.login_button);
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -41,7 +39,7 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        logout = (Button) findViewById(R.id.logout_button);
+        final Button logout = (Button) findViewById(R.id.logout_button);
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -54,8 +52,8 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onAuthChecked(boolean authenticated) {
                 if (authenticated) {
-                    login.setVisibility(View.VISIBLE);
-                    logout.setVisibility(View.GONE);
+                    logout.setVisibility(View.VISIBLE);
+                    login.setVisibility(View.GONE);
                     Toast.makeText(MainActivity.this, "authed", Toast.LENGTH_SHORT).show();
                     MeLocationRequest llLocation = MeLocationRequest.prepareRequest(500);
                     llLocation.get(MainActivity.this, new MeLocationRequest.OnLocationFetched() {
@@ -75,8 +73,8 @@ public class MainActivity extends ActionBarActivity {
                     });
                 } else {
                     //LifeLog.doLogin(MainActivity.this);
-                    logout.setVisibility(View.VISIBLE);
-                    login.setVisibility(View.GONE);
+                    login.setVisibility(View.VISIBLE);
+                    logout.setVisibility(View.GONE);
                 }
             }
         });
