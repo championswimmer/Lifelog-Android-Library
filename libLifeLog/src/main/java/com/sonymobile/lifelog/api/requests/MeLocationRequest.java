@@ -1,6 +1,8 @@
 package com.sonymobile.lifelog.api.requests;
 
 import android.content.Context;
+import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
@@ -29,10 +31,12 @@ public class MeLocationRequest {
 
     public static final String TAG = "LifeLog:LocationAPI";
     static JsonObjectRequest lastLocationRequest;
-    static String API_URL = LifeLog.API_BASE_URL + "/users/me/locations";
     String startTime, endTime;
     Integer limit;
     String authToken;
+
+    private static final Uri LOCATION_BASE_URL =
+            Uri.parse(LifeLog.API_BASE_URL).buildUpon().appendEncodedPath("users/me/locations").build();
 
     public MeLocationRequest(Calendar start, Calendar end, Integer lim) {
         if (start != null) startTime = ISO8601Date.fromCalendar(start);
@@ -60,22 +64,20 @@ public class MeLocationRequest {
                 authToken = LifeLog.getAuthToken(context);
             }
         });
-        String requestUrl = API_URL;
-        String params = "";
-        if (startTime != null) {
-            params += "start_time=" + startTime;
+
+        Uri.Builder uriBuilder = LOCATION_BASE_URL.buildUpon();
+        if (!TextUtils.isEmpty(startTime)) {
+            uriBuilder.appendQueryParameter("start_time", startTime);
         }
-        if (endTime != null) {
-            params += "end_time=" + endTime;
+        if (!TextUtils.isEmpty(endTime)) {
+            uriBuilder.appendQueryParameter("end_time", endTime);
         }
-        if (limit != null) {
-            params += "limit=" + limit;
+        if (limit > 0) {
+            uriBuilder.appendQueryParameter("limit", String.valueOf(limit));
         }
-        if (params.length() > 1) {
-            requestUrl += "?" + params;
-        }
+
         final JsonObjectRequest locationRequest = new JsonObjectRequest(Request.Method.GET,
-                requestUrl, (JSONObject) null,
+                uriBuilder.toString(), (JSONObject) null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject) {

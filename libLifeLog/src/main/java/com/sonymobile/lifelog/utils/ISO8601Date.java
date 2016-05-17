@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 /**
  * Helper class for handling a most common subset of ISO 8601 strings
@@ -18,9 +19,9 @@ public final class ISO8601Date {
      */
     public static String fromCalendar(final Calendar calendar) {
         Date date = calendar.getTime();
-        String formatted = new SimpleDateFormat("YYYY-MM-DD’T’hh:mm:ss.sssTZD")
-                .format(date);
-        return formatted.substring(0, 27) + ":" + formatted.substring(27);
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return formatter.format(date);
     }
 
     /**
