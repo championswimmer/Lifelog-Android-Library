@@ -31,7 +31,6 @@ import java.util.Map;
 public class MeLocationRequest {
 
     public static final String TAG = "LifeLog:LocationAPI";
-    static JsonObjectRequest lastLocationRequest;
     String startTime, endTime;
     Integer limit;
     String authToken;
@@ -89,30 +88,11 @@ public class MeLocationRequest {
                             Log.v(TAG, jsonObject.toString());
                         }
                         try {
-                            if (jsonObject.has("error")) {
-                                if (jsonObject.getJSONObject("error").getString("code").contains("401")) {
-                                    LifeLog.checkAuthentication(appContext, new LifeLog.OnAuthenticationChecked() {
-                                        @Override
-                                        public void onAuthChecked(boolean authenticated) {
-                                            if (authenticated && (lastLocationRequest != null))
-                                                VolleySingleton.getInstance(appContext).addToRequestQueue(lastLocationRequest);
-                                        }
-                                    });
-                                }
-                            }
-                        } catch (Exception e) {
-                            if (Debug.isDebuggable(appContext)) {
-                                Log.w(TAG, "Exception", e);
-                            }
-                        }
-
-                        try {
                             JSONArray resultArray = jsonObject.getJSONArray("result");
                             for (int i = 0; i < resultArray.length(); i++) {
                                 locations.add(new MeLocation(resultArray.getJSONObject(i)));
                             }
                             olf.onLocationFetched(locations);
-                            lastLocationRequest = null;
                         } catch (JSONException e) {
                             if (Debug.isDebuggable(appContext)) {
                                 Log.w(TAG, "JSONException", e);
@@ -141,7 +121,6 @@ public class MeLocationRequest {
                 return headerMap;
             }
         };
-        lastLocationRequest = locationRequest;
         VolleySingleton.getInstance(appContext).addToRequestQueue(locationRequest);
     }
 

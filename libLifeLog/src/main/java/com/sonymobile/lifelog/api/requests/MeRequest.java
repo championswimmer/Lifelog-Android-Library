@@ -26,7 +26,6 @@ import java.util.Map;
 public class MeRequest {
 
     public static final String TAG = "LifeLog:MeRequest";
-    static JsonObjectRequest lastMeRequest;
     static String API_URL = LifeLog.API_BASE_URL + "/users/me";
     String authToken;
 
@@ -58,22 +57,6 @@ public class MeRequest {
                     public void onResponse(JSONObject jsonObject) {
                         Log.v(TAG, jsonObject.toString());
                         try {
-                            if (jsonObject.has("error")) {
-                                if (jsonObject.getJSONObject("error").getString("code").contains("401")) {
-                                    LifeLog.checkAuthentication(context, new LifeLog.OnAuthenticationChecked() {
-                                        @Override
-                                        public void onAuthChecked(boolean authenticated) {
-                                            if (authenticated && (lastMeRequest != null))
-                                                VolleySingleton.getInstance(context).addToRequestQueue(lastMeRequest);
-                                        }
-                                    });
-                                }
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
-                        try {
                             JSONArray resultArray = jsonObject.getJSONArray("result");
                             JSONObject meObject = resultArray.getJSONObject(0);
 
@@ -81,8 +64,6 @@ public class MeRequest {
                             Me meData = gson.fromJson(meObject.toString(), Me.class);
 
                             omf.onMeFetched(meData);
-
-                            lastMeRequest = null;
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -107,7 +88,6 @@ public class MeRequest {
                 return headerMap;
             }
         };
-        lastMeRequest = meRequest;
         VolleySingleton.getInstance(context).addToRequestQueue(meRequest);
 
     }
