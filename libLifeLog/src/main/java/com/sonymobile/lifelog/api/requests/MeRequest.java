@@ -27,7 +27,6 @@ public class MeRequest {
 
     public static final String TAG = "LifeLog:MeRequest";
     static String API_URL = LifeLog.API_BASE_URL + "/users/me";
-    String authToken;
 
     Gson gson;
 
@@ -40,14 +39,22 @@ public class MeRequest {
     }
 
     public void get(final Context context, final OnMeFetched omf) {
-        Log.v(TAG, "get called");
+        if (Debug.isDebuggable(context)) {
+            Log.v(TAG, "get called");
+        }
+        final Context appContext = context.getApplicationContext();
 
-        LifeLog.checkAuthentication(context, new LifeLog.OnAuthenticationChecked() {
+        LifeLog.checkAuthentication(appContext, new LifeLog.OnAuthenticationChecked() {
             @Override
             public void onAuthChecked(boolean authenticated) {
-                authToken = LifeLog.getAuthToken(context);
+                if (authenticated) {
+                    callMeApi(appContext, omf);
+                }
             }
         });
+    }
+
+    private void callMeApi(final Context appContext, final OnMeFetched omf) {
         String requestUrl = API_URL;
 
         final JsonObjectRequest meRequest = new JsonObjectRequest(Request.Method.GET,
@@ -81,14 +88,14 @@ public class MeRequest {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headerMap = new HashMap<>(5);
-                headerMap.put("Authorization", "Bearer " + authToken);
+                headerMap.put("Authorization", "Bearer " + LifeLog.getAuthToken(appContext));
                 headerMap.put("Accept", "application/json");
                 //headerMap.put("Accept-Encoding", "gzip");
                 //headerMap.put("Content-Encoding", "gzip");
                 return headerMap;
             }
         };
-        VolleySingleton.getInstance(context).addToRequestQueue(meRequest);
+        VolleySingleton.getInstance(appContext).addToRequestQueue(meRequest);
 
     }
 
