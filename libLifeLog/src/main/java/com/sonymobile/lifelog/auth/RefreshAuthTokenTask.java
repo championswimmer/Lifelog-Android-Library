@@ -50,7 +50,9 @@ public class RefreshAuthTokenTask {
                         + PARAM_GRANT_TYPE + "=" + "refresh_token" + "&"
                         + PARAM_REFRESH_TOKEN + "=" + spref.getString(AUTH_REFRESH_TOKEN);
 
-        Log.d(TAG, refreshAuthBody);
+        if (Debug.isDebuggable(mContext)) {
+            Log.d(TAG, refreshAuthBody);
+        }
 
         JsonObjectRequest authRequest = new JsonObjectRequest(Request.Method.POST,
                 OAUTH2_URL,
@@ -59,15 +61,20 @@ public class RefreshAuthTokenTask {
                     @Override
                     public void onResponse(JSONObject jObj) {
                         try {
+                            if (Debug.isDebuggable(mContext)) {
+                                Log.v(TAG, "refresh token json: " + jObj);
+                            }
 
                             spref.put(AUTH_ACCESS_TOKEN, jObj.getString(AUTH_ACCESS_TOKEN));
                             spref.put(AUTH_EXPIRES_IN, jObj.getString(AUTH_EXPIRES_IN));
                             spref.put(AUTH_EXPIRES, jObj.getString(AUTH_EXPIRES));
                             spref.put(AUTH_ISSUED_AT, jObj.getString(AUTH_ISSUED_AT));
                             spref.put(AUTH_REFRESH_TOKEN, jObj.getString(AUTH_REFRESH_TOKEN));
-                            Log.d(TAG, jObj.getString(AUTH_ACCESS_TOKEN));
-                            Log.d(TAG, jObj.getString(AUTH_EXPIRES));
-                            Log.d(TAG, jObj.getString(AUTH_REFRESH_TOKEN));
+                            if (Debug.isDebuggable(mContext)) {
+                                Log.d(TAG, jObj.getString(AUTH_ACCESS_TOKEN));
+                                Log.d(TAG, jObj.getString(AUTH_EXPIRES));
+                                Log.d(TAG, jObj.getString(AUTH_REFRESH_TOKEN));
+                            }
                             if (onAuthenticatedListener != null) {
                                 onAuthenticatedListener.onAuthenticated(jObj.getString(AUTH_ACCESS_TOKEN));
                             }
