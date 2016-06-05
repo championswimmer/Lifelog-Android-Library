@@ -21,10 +21,10 @@ public class LifeLog {
 
     // file name of preference
     private static final String LIFELOG_PREFS = "lifelog_prefs";
-    static String client_id = "";
-    static String client_secret = "";
-    static String login_scope = "";
-    static String callback_url = "";
+    private static String client_id = "";
+    private static String client_secret = "";
+    private static String login_scope = "";
+    private static String callback_url = "";
 
     public static String getClient_id() {
         return client_id;
