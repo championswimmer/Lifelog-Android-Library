@@ -23,11 +23,9 @@ import java.util.Map;
 
     @Override
     public Map<String, String> getHeaders() throws AuthFailureError {
-        Map<String, String> headerMap = new HashMap<>(5);
+        Map<String, String> headerMap = new HashMap<>(super.getHeaders());
         headerMap.put("Authorization", "Bearer " + LifeLog.getAuthToken(mContext));
         headerMap.put("Accept", "application/json");
-        //headerMap.put("Accept-Encoding", "gzip");
-        //headerMap.put("Content-Encoding", "gzip");
         return headerMap;
     }
 }
