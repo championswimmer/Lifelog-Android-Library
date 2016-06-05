@@ -45,8 +45,8 @@ public class RefreshAuthTokenTask {
         final SecurePreferences spref = LifeLog.getSecurePreference(mContext);
 
         final String refreshAuthBody =
-                PARAM_CLIENT_ID + "=" + LifeLog.getClient_id() + "&"
-                        + PARAM_CLIENT_SECRET + "=" + LifeLog.getClient_secret() + "&"
+                PARAM_CLIENT_ID + "=" + LifeLog.getClientId() + "&"
+                        + PARAM_CLIENT_SECRET + "=" + LifeLog.getClientSecret() + "&"
                         + PARAM_GRANT_TYPE + "=" + "refresh_token" + "&"
                         + PARAM_REFRESH_TOKEN + "=" + spref.getString(AUTH_REFRESH_TOKEN);
 

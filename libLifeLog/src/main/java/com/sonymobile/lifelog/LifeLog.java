@@ -21,21 +21,21 @@ public class LifeLog {
 
     // file name of preference
     private static final String LIFELOG_PREFS = "lifelog_prefs";
-    private static String client_id = "";
-    private static String client_secret = "";
-    private static String login_scope = "";
-    private static String callback_url = "";
+    private static String sClientId = "";
+    private static String sClientSecret = "";
+    private static String sLoginScope = "";
+    private static String sCallbackUrl = "";
 
-    public static String getClient_id() {
-        return client_id;
+    public static String getClientId() {
+        return sClientId;
     }
 
-    public static String getClient_secret() {
-        return client_secret;
+    public static String getClientSecret() {
+        return sClientSecret;
     }
 
-    public static String getCallback_url() {
-        return callback_url;
+    public static String getCallbackUrl() {
+        return sCallbackUrl;
     }
 
     @Nullable
@@ -45,29 +45,29 @@ public class LifeLog {
     }
 
     public static void initialise(String id, String secret, String callbackUrl) {
-        client_id = id;
-        client_secret = secret;
-        callback_url = callbackUrl;
+        sClientId = id;
+        sClientSecret = secret;
+        sCallbackUrl = callbackUrl;
         setScope(Scopes.PROFILE_READ, Scopes.ACTIVITIES_READ, Scopes.LOCATIONS_READ);
     }
 
     public static String getScope() {
-        return login_scope;
+        return sLoginScope;
     }
 
     public static void setScope(String... scopes) {
-        login_scope = "";
+        sLoginScope = "";
         for (String scope : scopes) {
-            if (TextUtils.isEmpty(login_scope)) {
-                login_scope = scope;
+            if (TextUtils.isEmpty(sLoginScope)) {
+                sLoginScope = scope;
             } else {
-                login_scope += "+" + scope;
+                sLoginScope += "+" + scope;
             }
         }
     }
 
     public static SecurePreferences getSecurePreference(Context context) {
-        return new SecurePreferences(context, LifeLog.LIFELOG_PREFS, LifeLog.getClient_secret(), true);
+        return new SecurePreferences(context, LifeLog.LIFELOG_PREFS, LifeLog.getClientSecret(), true);
     }
 
     /**
