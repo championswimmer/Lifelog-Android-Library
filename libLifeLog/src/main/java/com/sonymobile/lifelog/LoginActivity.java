@@ -45,7 +45,7 @@ public class LoginActivity extends Activity {
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if (url.startsWith(LifeLog.getCallback_url())) {
+                if (url.startsWith(LifeLog.getCallbackUrl())) {
                     final String authenticationCode = Uri.parse(url).getQueryParameter("code");
                     if (!TextUtils.isEmpty(authenticationCode)) {
                         mWebView.setVisibility(View.GONE);
@@ -95,7 +95,7 @@ public class LoginActivity extends Activity {
         }
 
         Uri uri = AUTH_BASE_URL.buildUpon()
-                .appendQueryParameter("client_id", LifeLog.getClient_id())
+                .appendQueryParameter("client_id", LifeLog.getClientId())
                 .appendQueryParameter("scope", LifeLog.getScope()).build();
 
         mWebView.loadUrl(uri.toString());

@@ -45,8 +45,8 @@ public class GetAuthTokenTask {
         onAuthenticatedListener = oal;
 
         final String authRequestBody =
-                PARAM_CLIENT_ID + "=" + LifeLog.getClient_id() + "&"
-                        + PARAM_CLIENT_SECRET + "=" + LifeLog.getClient_secret() + "&"
+                PARAM_CLIENT_ID + "=" + LifeLog.getClientId() + "&"
+                        + PARAM_CLIENT_SECRET + "=" + LifeLog.getClientSecret() + "&"
                         + PARAM_GRANT_TYPE + "=" + "authorization_code" + "&"
                         + PARAM_CODE + "=" + authCode;
 
