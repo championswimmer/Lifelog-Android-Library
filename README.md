@@ -48,15 +48,19 @@ LifeLog.doLogin(MainActivity.this)
 ```
 
 Note that, after login is completed, we will return back to same activity.
-Internally, `doLogin` makes a `startActivityForResult` call. Handle the returning user like this
+Internally, `doLogin` makes a `startActivityForResult` call with `LifeLog.LOGINACTIVITY_REQUEST_CODE` as request code. Handle the returning user like this
 
 ```java
-@Override
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == LifeLog.LOGINACTIVITY_REQUEST_CODE) {
-            //we are logged in, do what you please now
-            Toast.makeText(this, "User authenticated", Toast.LENGTH_SHORT).show();
+            if (resultCode == RESULT_OK) {
+                Toast.makeText(this, "User authenticated", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "User authentication failed", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 ```
