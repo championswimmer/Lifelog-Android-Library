@@ -33,7 +33,6 @@ public class MeLocationRequest {
     public static final String TAG = "LifeLog:LocationAPI";
     String startTime, endTime;
     Integer limit;
-    String authToken;
 
     private static final Uri LOCATION_BASE_URL =
             Uri.parse(LifeLog.API_BASE_URL).buildUpon().appendEncodedPath("users/me/locations").build();
@@ -60,13 +59,18 @@ public class MeLocationRequest {
         if (Debug.isDebuggable(appContext)) {
             Log.v(TAG, "get called");
         }
-        final ArrayList<MeLocation> locations = new ArrayList<>(limit);
         LifeLog.checkAuthentication(appContext, new LifeLog.OnAuthenticationChecked() {
             @Override
             public void onAuthChecked(boolean authenticated) {
-                authToken = LifeLog.getAuthToken(appContext);
+                if (authenticated) {
+                    callLocationApi(appContext, olf);
+                }
             }
         });
+    }
+
+    private void callLocationApi(final Context appContext, final OnLocationFetched olf) {
+        final ArrayList<MeLocation> locations = new ArrayList<>(limit);
 
         Uri.Builder uriBuilder = LOCATION_BASE_URL.buildUpon();
         if (!TextUtils.isEmpty(startTime)) {
@@ -114,7 +118,7 @@ public class MeLocationRequest {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headerMap = new HashMap<>(5);
-                headerMap.put("Authorization", "Bearer " + authToken);
+                headerMap.put("Authorization", "Bearer " + LifeLog.getAuthToken(appContext));
                 headerMap.put("Accept", "application/json");
                 //headerMap.put("Accept-Encoding", "gzip");
                 //headerMap.put("Content-Encoding", "gzip");
