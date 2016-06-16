@@ -103,8 +103,11 @@ public class LifeLog {
                     }
                 });
             }
+        } else {
+            // access token is not there due to some reason, reset preference just in case
+            securePreferences.clear();
+            oac.onAuthChecked(false);
         }
-        oac.onAuthChecked(false);
     }
 
     public interface OnAuthenticationChecked {
