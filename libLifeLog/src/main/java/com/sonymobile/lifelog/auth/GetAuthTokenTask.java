@@ -103,11 +103,4 @@ public class GetAuthTokenTask {
         VolleySingleton.getInstance(mContext).addToRequestQueue(authRequest);
     }
 
-    public interface OnAuthenticatedListener {
-        void onAuthenticated(String authToken);
-
-        void onError(Exception e);
-    }
-
-
 }

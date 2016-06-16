@@ -17,6 +17,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.sonymobile.lifelog.auth.GetAuthTokenTask;
+import com.sonymobile.lifelog.auth.OnAuthenticatedListener;
 import com.sonymobile.lifelog.utils.Debug;
 
 /**
@@ -54,7 +55,7 @@ public class LoginActivity extends Activity {
                         dialog.show(getFragmentManager(), PROGRESS_DIALOG_TAG);
 
                         GetAuthTokenTask gat = new GetAuthTokenTask(getApplicationContext());
-                        gat.getAuth(authenticationCode, new GetAuthTokenTask.OnAuthenticatedListener() {
+                        gat.getAuth(authenticationCode, new OnAuthenticatedListener() {
                             @Override
                             public void onAuthenticated(String authToken) {
                                 dialog.dismiss();

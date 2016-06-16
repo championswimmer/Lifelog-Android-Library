@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.sonymobile.lifelog.auth.GetAuthTokenTask;
+import com.sonymobile.lifelog.auth.OnAuthenticatedListener;
 import com.sonymobile.lifelog.auth.RefreshAuthTokenTask;
 import com.sonymobile.lifelog.utils.SecurePreferences;
 
@@ -96,10 +97,15 @@ public class LifeLog {
                 oac.onAuthChecked(true);
             } else {
                 RefreshAuthTokenTask ratt = new RefreshAuthTokenTask(context);
-                ratt.refreshAuth(new RefreshAuthTokenTask.OnAuthenticatedListener() {
+                ratt.refreshAuth(new OnAuthenticatedListener() {
                     @Override
                     public void onAuthenticated(String token) {
                         oac.onAuthChecked(true);
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        oac.onAuthChecked(false);
                     }
                 });
             }

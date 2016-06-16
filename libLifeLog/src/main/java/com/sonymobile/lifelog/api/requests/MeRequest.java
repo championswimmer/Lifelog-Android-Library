@@ -11,6 +11,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.gson.Gson;
 import com.sonymobile.lifelog.LifeLog;
 import com.sonymobile.lifelog.api.models.Me;
+import com.sonymobile.lifelog.utils.Debug;
 import com.sonymobile.lifelog.utils.VolleySingleton;
 
 import org.json.JSONArray;
