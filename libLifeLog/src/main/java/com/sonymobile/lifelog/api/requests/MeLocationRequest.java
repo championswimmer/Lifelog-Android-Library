@@ -5,7 +5,6 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -22,8 +21,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by championswimmer on 21/4/15.
@@ -83,8 +80,8 @@ public class MeLocationRequest {
             uriBuilder.appendQueryParameter("limit", String.valueOf(limit));
         }
 
-        final JsonObjectRequest locationRequest = new JsonObjectRequest(Request.Method.GET,
-                uriBuilder.toString(), (JSONObject) null,
+        final JsonObjectRequest locationRequest = new AuthedJsonObjectRequest(appContext,
+                Request.Method.GET, uriBuilder.toString(), (JSONObject) null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject) {
@@ -114,17 +111,7 @@ public class MeLocationRequest {
                         }
                     }
                 }
-        ) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headerMap = new HashMap<>(5);
-                headerMap.put("Authorization", "Bearer " + LifeLog.getAuthToken(appContext));
-                headerMap.put("Accept", "application/json");
-                //headerMap.put("Accept-Encoding", "gzip");
-                //headerMap.put("Content-Encoding", "gzip");
-                return headerMap;
-            }
-        };
+        );
         VolleySingleton.getInstance(appContext).addToRequestQueue(locationRequest);
     }
 

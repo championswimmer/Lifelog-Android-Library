@@ -3,7 +3,6 @@ package com.sonymobile.lifelog.api.requests;
 import android.content.Context;
 import android.util.Log;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -11,14 +10,12 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.gson.Gson;
 import com.sonymobile.lifelog.LifeLog;
 import com.sonymobile.lifelog.api.models.Me;
+import com.sonymobile.lifelog.utils.Debug;
 import com.sonymobile.lifelog.utils.VolleySingleton;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by championswimmer on 11/5/16.
@@ -57,8 +54,8 @@ public class MeRequest {
     private void callMeApi(final Context appContext, final OnMeFetched omf) {
         String requestUrl = API_URL;
 
-        final JsonObjectRequest meRequest = new JsonObjectRequest(Request.Method.GET,
-                requestUrl, (JSONObject) null,
+        final JsonObjectRequest meRequest = new AuthedJsonObjectRequest(appContext,
+                Request.Method.GET, requestUrl, (JSONObject) null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject) {
@@ -84,17 +81,7 @@ public class MeRequest {
 
                     }
                 }
-        ) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headerMap = new HashMap<>(5);
-                headerMap.put("Authorization", "Bearer " + LifeLog.getAuthToken(appContext));
-                headerMap.put("Accept", "application/json");
-                //headerMap.put("Accept-Encoding", "gzip");
-                //headerMap.put("Content-Encoding", "gzip");
-                return headerMap;
-            }
-        };
+        );
         VolleySingleton.getInstance(appContext).addToRequestQueue(meRequest);
 
     }
