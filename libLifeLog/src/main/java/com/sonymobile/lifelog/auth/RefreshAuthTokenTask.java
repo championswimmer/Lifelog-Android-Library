@@ -36,7 +36,7 @@ public class RefreshAuthTokenTask {
         this.mContext = context.getApplicationContext();
     }
 
-    public void refreshAuth(OnAuthenticatedListener oal) {
+    public void refreshAuth(final OnAuthenticatedListener oal) {
         onAuthenticatedListener = oal;
         final SecurePreferences spref = LifeLog.getSecurePreference(mContext);
 
@@ -78,7 +78,9 @@ public class RefreshAuthTokenTask {
                             if (Debug.isDebuggable(mContext)) {
                                 Log.w(TAG, "JSONException", e);
                             }
-                            //TODO: handle malformed json
+                            if (onAuthenticatedListener != null) {
+                                onAuthenticatedListener.onError(e);
+                            }
                         }
 
                     }
@@ -88,6 +90,9 @@ public class RefreshAuthTokenTask {
                     public void onErrorResponse(VolleyError volleyError) {
                         if (Debug.isDebuggable(mContext)) {
                             Log.w(TAG, "VolleyError: " + new String(volleyError.networkResponse.data), volleyError);
+                        }
+                        if (onAuthenticatedListener != null) {
+                            onAuthenticatedListener.onError(volleyError);
                         }
                     }
                 }
@@ -105,10 +110,4 @@ public class RefreshAuthTokenTask {
         };
         VolleySingleton.getInstance(mContext).addToRequestQueue(authRequest);
     }
-
-    public interface OnAuthenticatedListener {
-        void onAuthenticated(String auth_token);
-    }
-
-
 }
