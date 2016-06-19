@@ -22,10 +22,10 @@ import org.json.JSONObject;
  */
 public class MeRequest {
 
-    public static final String TAG = "LifeLog:MeRequest";
-    static String API_URL = LifeLog.API_BASE_URL + "/users/me";
+    private static final String TAG = "LifeLog:MeRequest";
+    private final static String API_URL = LifeLog.API_BASE_URL + "/users/me";
 
-    Gson gson;
+    private Gson gson;
 
     private MeRequest() {
 
@@ -52,10 +52,9 @@ public class MeRequest {
     }
 
     private void callMeApi(final Context appContext, final OnMeFetched omf) {
-        String requestUrl = API_URL;
 
         final JsonObjectRequest meRequest = new AuthedJsonObjectRequest(appContext,
-                Request.Method.GET, requestUrl, (JSONObject) null,
+                Request.Method.GET, API_URL, (JSONObject) null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject) {

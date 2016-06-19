@@ -22,13 +22,13 @@ import java.nio.charset.Charset;
  */
 public class RefreshAuthTokenTask {
 
-    public static final String TAG = "LifeLog:RefreshAuth";
-    public static final String OAUTH2_URL = "https://platform.lifelog.sonymobile.com/oauth/2/refresh_token";
+    private static final String TAG = "LifeLog:RefreshAuth";
+    private static final String OAUTH2_URL = "https://platform.lifelog.sonymobile.com/oauth/2/refresh_token";
 
-    static String PARAM_CLIENT_ID = "client_id";
-    static String PARAM_CLIENT_SECRET = "client_secret";
-    static String PARAM_GRANT_TYPE = "grant_type";
-    static String PARAM_REFRESH_TOKEN = "refresh_token";
+    private final static String PARAM_CLIENT_ID = "client_id";
+    private final static String PARAM_CLIENT_SECRET = "client_secret";
+    private final static String PARAM_GRANT_TYPE = "grant_type";
+    private final static String PARAM_REFRESH_TOKEN = "refresh_token";
     private Context mContext;
     private OnAuthenticatedListener onAuthenticatedListener;
 
