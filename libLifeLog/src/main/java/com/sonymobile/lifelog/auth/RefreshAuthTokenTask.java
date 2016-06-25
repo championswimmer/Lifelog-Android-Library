@@ -72,7 +72,7 @@ public class RefreshAuthTokenTask {
                                 Log.d(TAG, jObj.getString(GetAuthTokenTask.AUTH_REFRESH_TOKEN));
                             }
                             if (onAuthenticatedListener != null) {
-                                onAuthenticatedListener.onAuthenticated(jObj.getString(GetAuthTokenTask.AUTH_ACCESS_TOKEN));
+                                onAuthenticatedListener.onAuthenticated();
                             }
                         } catch (JSONException e) {
                             if (Debug.isDebuggable(mContext)) {
