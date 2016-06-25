@@ -66,7 +66,9 @@ public class MeRequest {
 
                             omf.onMeFetched(meData);
                         } catch (JSONException e) {
-                            e.printStackTrace();
+                            if (Debug.isDebuggable(appContext)) {
+                                Log.w(TAG, "JSONException", e);
+                            }
                         }
 
 
