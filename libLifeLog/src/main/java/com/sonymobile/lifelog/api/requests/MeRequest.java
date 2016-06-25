@@ -25,8 +25,6 @@ public class MeRequest {
     private static final String TAG = "LifeLog:MeRequest";
     private final static String API_URL = LifeLog.API_BASE_URL + "/users/me";
 
-    private Gson gson;
-
     private MeRequest() {
 
     }
@@ -63,7 +61,7 @@ public class MeRequest {
                             JSONArray resultArray = jsonObject.getJSONArray("result");
                             JSONObject meObject = resultArray.getJSONObject(0);
 
-                            gson = new Gson();
+                            Gson gson = new Gson();
                             Me meData = gson.fromJson(meObject.toString(), Me.class);
 
                             omf.onMeFetched(meData);
