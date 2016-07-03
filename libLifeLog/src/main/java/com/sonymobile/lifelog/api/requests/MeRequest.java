@@ -22,10 +22,8 @@ import org.json.JSONObject;
  */
 public class MeRequest {
 
-    public static final String TAG = "LifeLog:MeRequest";
-    static String API_URL = LifeLog.API_BASE_URL + "/users/me";
-
-    Gson gson;
+    private static final String TAG = "LifeLog:MeRequest";
+    private final static String API_URL = LifeLog.API_BASE_URL + "/users/me";
 
     private MeRequest() {
 
@@ -52,10 +50,9 @@ public class MeRequest {
     }
 
     private void callMeApi(final Context appContext, final OnMeFetched omf) {
-        String requestUrl = API_URL;
 
         final JsonObjectRequest meRequest = new AuthedJsonObjectRequest(appContext,
-                Request.Method.GET, requestUrl, (JSONObject) null,
+                Request.Method.GET, API_URL, (JSONObject) null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject) {
@@ -64,12 +61,14 @@ public class MeRequest {
                             JSONArray resultArray = jsonObject.getJSONArray("result");
                             JSONObject meObject = resultArray.getJSONObject(0);
 
-                            gson = new Gson();
+                            Gson gson = new Gson();
                             Me meData = gson.fromJson(meObject.toString(), Me.class);
 
                             omf.onMeFetched(meData);
                         } catch (JSONException e) {
-                            e.printStackTrace();
+                            if (Debug.isDebuggable(appContext)) {
+                                Log.w(TAG, "JSONException", e);
+                            }
                         }
 
 

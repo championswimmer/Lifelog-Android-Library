@@ -99,7 +99,7 @@ public class LifeLog {
                 RefreshAuthTokenTask ratt = new RefreshAuthTokenTask(context);
                 ratt.refreshAuth(new OnAuthenticatedListener() {
                     @Override
-                    public void onAuthenticated(String token) {
+                    public void onAuthenticated() {
                         oac.onAuthChecked(true);
                     }
 

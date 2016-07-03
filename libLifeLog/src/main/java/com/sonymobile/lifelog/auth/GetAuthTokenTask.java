@@ -70,7 +70,7 @@ public class GetAuthTokenTask {
                                 Log.d(TAG, jObj.getString(AUTH_REFRESH_TOKEN));
                             }
                             if (onAuthenticatedListener != null) {
-                                onAuthenticatedListener.onAuthenticated(jObj.getString(AUTH_ACCESS_TOKEN));
+                                onAuthenticatedListener.onAuthenticated();
                             }
                         } catch (JSONException e) {
                             if (onAuthenticatedListener != null) {

@@ -57,7 +57,7 @@ public class LoginActivity extends Activity {
                         GetAuthTokenTask gat = new GetAuthTokenTask(getApplicationContext());
                         gat.getAuth(authenticationCode, new OnAuthenticatedListener() {
                             @Override
-                            public void onAuthenticated(String authToken) {
+                            public void onAuthenticated() {
                                 dialog.dismiss();
 
                                 setResult(RESULT_OK);

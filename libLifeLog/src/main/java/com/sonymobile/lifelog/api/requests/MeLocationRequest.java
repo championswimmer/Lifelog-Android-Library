@@ -27,9 +27,9 @@ import java.util.Calendar;
  */
 public class MeLocationRequest {
 
-    public static final String TAG = "LifeLog:LocationAPI";
-    String startTime, endTime;
-    Integer limit;
+    private static final String TAG = "LifeLog:LocationAPI";
+    private String startTime, endTime;
+    private Integer limit;
 
     private static final Uri LOCATION_BASE_URL =
             Uri.parse(LifeLog.API_BASE_URL).buildUpon().appendEncodedPath("users/me/locations").build();

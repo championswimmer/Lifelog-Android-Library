@@ -1,7 +1,7 @@
 package com.sonymobile.lifelog.auth;
 
 public interface OnAuthenticatedListener {
-    void onAuthenticated(String authToken);
+    void onAuthenticated();
 
     void onError(Exception e);
 }
