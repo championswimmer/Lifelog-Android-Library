@@ -100,7 +100,13 @@ public class GetAuthTokenTask {
             }
 
         };
-        VolleySingleton.getInstance(mContext).addToRequestQueue(authRequest);
+
+        VolleySingleton volley = VolleySingleton.getInstance(mContext);
+        volley.addToRequestQueue(authRequest);
+
+        // VolleySingleton is public and visible, client app may stop the thread of Volley to suppress
+        // battery consumption etc. Call start API explicitly to ensure for operation start
+        volley.getRequestQueue().start();
     }
 
 }
