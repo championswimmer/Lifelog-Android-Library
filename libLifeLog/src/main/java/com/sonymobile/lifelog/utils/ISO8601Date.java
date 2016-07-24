@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.TimeZone;
 
 /**
@@ -19,7 +20,7 @@ public final class ISO8601Date {
      */
     public static String fromCalendar(final Calendar calendar) {
         Date date = calendar.getTime();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
         formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
         return formatter.format(date);
     }
@@ -44,7 +45,7 @@ public final class ISO8601Date {
         int lastIndex = s.lastIndexOf(":");
         s = s.substring(0, lastIndex) + s.substring(lastIndex + 1);
 
-        Date date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse(s);
+        Date date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US).parse(s);
 
         // TODO Because Date class of Java does not handle timezone, timezone information
         // in calendar is incorrect and system default is used regardless of original String.
