@@ -37,13 +37,17 @@ public final class ISO8601Date {
     public static Calendar toCalendar(final String iso8601string)
             throws ParseException {
         Calendar calendar = GregorianCalendar.getInstance();
-        String s = iso8601string.replace("Z", "+00:00");
-        try {
-            s = s.substring(0, 27) + s.substring(28);  // to get rid of the ":"
-        } catch (IndexOutOfBoundsException e) {
-            throw new ParseException("Invalid length", 0);
-        }
-        Date date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").parse(s);
+        // if it ends with "Z", replace it.
+        String s = iso8601string.replaceAll("Z$", "+00:00");
+
+        // to get rid of the last ":" to convert from ISO 8601 to RFC 822
+        int lastIndex = s.lastIndexOf(":");
+        s = s.substring(0, lastIndex) + s.substring(lastIndex + 1);
+
+        Date date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse(s);
+
+        // TODO Because Date class of Java does not handle timezone, timezone information
+        // in calendar is incorrect and system default is used regardless of original String.
         calendar.setTime(date);
         return calendar;
     }
