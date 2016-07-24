@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.TimeZone;
 
 /**
@@ -14,14 +15,20 @@ import java.util.TimeZone;
  * missing.
  */
 public final class ISO8601Date {
+
+    private static final SimpleDateFormat FROM_CALENDAR_FORMATTER =
+            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+
+    private static final SimpleDateFormat TO_CALENDAR_FORMATTER =
+            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US);
+
     /**
      * Transform Calendar to ISO 8601 string.
      */
     public static String fromCalendar(final Calendar calendar) {
         Date date = calendar.getTime();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return formatter.format(date);
+        FROM_CALENDAR_FORMATTER.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return FROM_CALENDAR_FORMATTER.format(date);
     }
 
     /**
@@ -31,19 +38,24 @@ public final class ISO8601Date {
         return fromCalendar(GregorianCalendar.getInstance());
     }
 
+
     /**
      * Transform ISO 8601 string to Calendar.
      */
     public static Calendar toCalendar(final String iso8601string)
             throws ParseException {
         Calendar calendar = GregorianCalendar.getInstance();
-        String s = iso8601string.replace("Z", "+00:00");
-        try {
-            s = s.substring(0, 27) + s.substring(28);  // to get rid of the ":"
-        } catch (IndexOutOfBoundsException e) {
-            throw new ParseException("Invalid length", 0);
-        }
-        Date date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").parse(s);
+        // if it ends with "Z", replace it.
+        String s = iso8601string.replaceAll("Z$", "+00:00");
+
+        // to get rid of the last ":" to convert from ISO 8601 to RFC 822
+        int lastIndex = s.lastIndexOf(":");
+        s = s.substring(0, lastIndex) + s.substring(lastIndex + 1);
+
+        Date date = TO_CALENDAR_FORMATTER.parse(s);
+
+        // TODO Because Date class of Java does not handle timezone, timezone information
+        // in calendar is incorrect and system default is used regardless of original String.
         calendar.setTime(date);
         return calendar;
     }
