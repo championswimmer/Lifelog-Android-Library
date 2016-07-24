@@ -15,14 +15,20 @@ import java.util.TimeZone;
  * missing.
  */
 public final class ISO8601Date {
+
+    private static final SimpleDateFormat FROM_CALENDAR_FORMATTER =
+            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+
+    private static final SimpleDateFormat TO_CALENDAR_FORMATTER =
+            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US);
+
     /**
      * Transform Calendar to ISO 8601 string.
      */
     public static String fromCalendar(final Calendar calendar) {
         Date date = calendar.getTime();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
-        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return formatter.format(date);
+        FROM_CALENDAR_FORMATTER.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return FROM_CALENDAR_FORMATTER.format(date);
     }
 
     /**
@@ -31,6 +37,7 @@ public final class ISO8601Date {
     public static String now() {
         return fromCalendar(GregorianCalendar.getInstance());
     }
+
 
     /**
      * Transform ISO 8601 string to Calendar.
@@ -45,7 +52,7 @@ public final class ISO8601Date {
         int lastIndex = s.lastIndexOf(":");
         s = s.substring(0, lastIndex) + s.substring(lastIndex + 1);
 
-        Date date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US).parse(s);
+        Date date = TO_CALENDAR_FORMATTER.parse(s);
 
         // TODO Because Date class of Java does not handle timezone, timezone information
         // in calendar is incorrect and system default is used regardless of original String.
