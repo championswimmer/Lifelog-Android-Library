@@ -27,7 +27,7 @@ import java.nio.charset.Charset;
 
     @Override
     public String getBodyContentType() {
-        return String.format("application/x-www-form-urlencoded; charset=%s", new Object[]{"utf-8"});
+        return "application/x-www-form-urlencoded; charset=utf-8";
     }
 
     @Override
