@@ -44,7 +44,7 @@ public class RefreshAuthTokenTask {
                 PARAM_CLIENT_ID + "=" + LifeLog.getClientId() + "&"
                         + PARAM_CLIENT_SECRET + "=" + LifeLog.getClientSecret() + "&"
                         + PARAM_GRANT_TYPE + "=" + "refresh_token" + "&"
-                        + PARAM_REFRESH_TOKEN + "=" + spref.getString(GetAuthTokenTask.AUTH_REFRESH_TOKEN);
+                        + PARAM_REFRESH_TOKEN + "=" + spref.getString(AuthTokenConstants.AUTH_REFRESH_TOKEN);
 
         if (Debug.isDebuggable(mContext)) {
             Log.d(TAG, refreshAuthBody);
@@ -61,15 +61,16 @@ public class RefreshAuthTokenTask {
                                 Log.v(TAG, "refresh token json: " + jObj);
                             }
 
-                            spref.put(GetAuthTokenTask.AUTH_TOKEN_TYPE, jObj.getString(GetAuthTokenTask.AUTH_TOKEN_TYPE));
-                            spref.put(GetAuthTokenTask.AUTH_EXPIRES_IN, jObj.getString(GetAuthTokenTask.AUTH_EXPIRES_IN));
-                            spref.put(GetAuthTokenTask.AUTH_REFRESH_TOKEN, jObj.getString(GetAuthTokenTask.AUTH_REFRESH_TOKEN));
-                            spref.put(GetAuthTokenTask.AUTH_REFRESH_TOKEN_EXPIRES_IN, jObj.getString(GetAuthTokenTask.AUTH_REFRESH_TOKEN_EXPIRES_IN));
-                            spref.put(GetAuthTokenTask.AUTH_ACCESS_TOKEN, jObj.getString(GetAuthTokenTask.AUTH_ACCESS_TOKEN));
-                            spref.put(GetAuthTokenTask.AUTH_ISSUE_AT, String.valueOf(System.currentTimeMillis() / 1000));
+                            spref.put(AuthTokenConstants.AUTH_TOKEN_TYPE, jObj.getString(AuthTokenConstants.AUTH_TOKEN_TYPE));
+                            spref.put(AuthTokenConstants.AUTH_EXPIRES_IN, jObj.getString(AuthTokenConstants.AUTH_EXPIRES_IN));
+                            spref.put(AuthTokenConstants.AUTH_REFRESH_TOKEN, jObj.getString(AuthTokenConstants.AUTH_REFRESH_TOKEN));
+                            spref.put(AuthTokenConstants.AUTH_REFRESH_TOKEN_EXPIRES_IN,
+                                      jObj.getString(AuthTokenConstants.AUTH_REFRESH_TOKEN_EXPIRES_IN));
+                            spref.put(AuthTokenConstants.AUTH_ACCESS_TOKEN, jObj.getString(AuthTokenConstants.AUTH_ACCESS_TOKEN));
+                            spref.put(AuthTokenConstants.AUTH_ISSUE_AT, String.valueOf(System.currentTimeMillis() / 1000));
                             if (Debug.isDebuggable(mContext)) {
-                                Log.d(TAG, jObj.getString(GetAuthTokenTask.AUTH_ACCESS_TOKEN));
-                                Log.d(TAG, jObj.getString(GetAuthTokenTask.AUTH_REFRESH_TOKEN));
+                                Log.d(TAG, jObj.getString(AuthTokenConstants.AUTH_ACCESS_TOKEN));
+                                Log.d(TAG, jObj.getString(AuthTokenConstants.AUTH_REFRESH_TOKEN));
                             }
                             if (onAuthenticatedListener != null) {
                                 onAuthenticatedListener.onAuthenticated();
