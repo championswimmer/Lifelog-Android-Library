@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import com.sonymobile.lifelog.auth.GetAuthTokenTask;
+import com.sonymobile.lifelog.auth.AuthTokenConstants;
 import com.sonymobile.lifelog.auth.OnAuthenticatedListener;
 import com.sonymobile.lifelog.auth.RefreshAuthTokenTask;
 import com.sonymobile.lifelog.utils.SecurePreferences;
@@ -42,7 +42,7 @@ public class LifeLog {
     @Nullable
     public static String getAuthToken(Context context) {
         SecurePreferences preference = getSecurePreference(context);
-        return preference.getString(GetAuthTokenTask.AUTH_ACCESS_TOKEN);
+        return preference.getString(AuthTokenConstants.AUTH_ACCESS_TOKEN);
     }
 
     public static void initialise(String id, String secret, String callbackUrl) {
@@ -86,11 +86,11 @@ public class LifeLog {
     public static void checkAuthentication(Context context, final OnAuthenticationChecked oac) {
         context = context.getApplicationContext();
         SecurePreferences securePreferences = getSecurePreference(context);
-        if (securePreferences.containsKey(GetAuthTokenTask.AUTH_ACCESS_TOKEN)) {
+        if (securePreferences.containsKey(AuthTokenConstants.AUTH_ACCESS_TOKEN)) {
             long expiresIn = Long
-                    .valueOf(securePreferences.getString(GetAuthTokenTask.AUTH_EXPIRES_IN));
+                    .valueOf(securePreferences.getString(AuthTokenConstants.AUTH_EXPIRES_IN));
             long issueAt = Long
-                    .valueOf(securePreferences.getString(GetAuthTokenTask.AUTH_ISSUE_AT));
+                    .valueOf(securePreferences.getString(AuthTokenConstants.AUTH_ISSUE_AT));
 
             // if access token expires in next 2 minutes
             if (issueAt + expiresIn - System.currentTimeMillis() / 1000 > 120) {
