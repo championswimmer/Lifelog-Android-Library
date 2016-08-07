@@ -121,3 +121,8 @@ MeLocationRequest llLocation = MeLocationRequest.prepareRequest(500);
         }
     });
 ```
+
+### Developers 
+
+ - @championswimmer
+ - @francais-harry
