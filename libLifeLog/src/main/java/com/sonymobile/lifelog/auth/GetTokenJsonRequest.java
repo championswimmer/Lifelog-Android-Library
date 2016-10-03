@@ -87,8 +87,18 @@ import java.nio.charset.Charset;
         @Override
         public void onErrorResponse(VolleyError error) {
             if (Debug.isDebuggable(mContext)) {
-                Log.w(TAG, "VolleyError: " + new String(error.networkResponse.data), error);
+                Log.w(TAG, "VolleyError, status code: " + error.networkResponse.statusCode
+                        + ", message: " + new String(error.networkResponse.data), error);
             }
+
+            if (error.networkResponse.statusCode == 400) {
+                if (Debug.isDebuggable(mContext)) {
+                    Log.w(TAG, "User may revoked permission of the app from Lifelog service, clear token data.");
+                }
+                SecurePreferences preference = LifeLog.getSecurePreference(mContext);
+                preference.clear();
+            }
+
             if (mListener != null) {
                 mListener.onError(error);
             }
