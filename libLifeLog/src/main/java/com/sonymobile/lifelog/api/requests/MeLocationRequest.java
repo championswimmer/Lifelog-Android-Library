@@ -28,16 +28,16 @@ import java.util.Calendar;
 public class MeLocationRequest {
 
     private static final String TAG = "LifeLog:LocationAPI";
-    private String startTime, endTime;
-    private Integer limit;
+    private String mStartTime, mEndTime;
+    private Integer mLimit;
 
     private static final Uri LOCATION_BASE_URL =
             Uri.parse(LifeLog.API_BASE_URL).buildUpon().appendEncodedPath("users/me/locations").build();
 
     public MeLocationRequest(Calendar start, Calendar end, Integer lim) {
-        if (start != null) startTime = ISO8601Date.fromCalendar(start);
-        if (end != null) endTime = ISO8601Date.fromCalendar(end);
-        limit = lim;
+        if (start != null) mStartTime = ISO8601Date.fromCalendar(start);
+        if (end != null) mEndTime = ISO8601Date.fromCalendar(end);
+        mLimit = lim;
     }
 
     public static MeLocationRequest prepareRequest(Calendar start, Calendar end, Integer lim) {
@@ -67,17 +67,17 @@ public class MeLocationRequest {
     }
 
     private void callLocationApi(final Context appContext, final OnLocationFetched olf) {
-        final ArrayList<MeLocation> locations = new ArrayList<>(limit);
+        final ArrayList<MeLocation> locations = new ArrayList<>(mLimit);
 
         Uri.Builder uriBuilder = LOCATION_BASE_URL.buildUpon();
-        if (!TextUtils.isEmpty(startTime)) {
-            uriBuilder.appendQueryParameter("start_time", startTime);
+        if (!TextUtils.isEmpty(mStartTime)) {
+            uriBuilder.appendQueryParameter("start_time", mStartTime);
         }
-        if (!TextUtils.isEmpty(endTime)) {
-            uriBuilder.appendQueryParameter("end_time", endTime);
+        if (!TextUtils.isEmpty(mEndTime)) {
+            uriBuilder.appendQueryParameter("end_time", mEndTime);
         }
-        if (limit > 0) {
-            uriBuilder.appendQueryParameter("limit", String.valueOf(limit));
+        if (mLimit > 0) {
+            uriBuilder.appendQueryParameter("limit", String.valueOf(mLimit));
         }
 
         final JsonObjectRequest locationRequest = new AuthedJsonObjectRequest(appContext,
