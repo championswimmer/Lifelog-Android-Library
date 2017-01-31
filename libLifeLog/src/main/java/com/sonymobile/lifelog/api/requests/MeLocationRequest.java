@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
+import android.webkit.URLUtil;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -30,6 +31,8 @@ public class MeLocationRequest {
     private static final String TAG = "LifeLog:LocationAPI";
     private String mStartTime, mEndTime;
     private Integer mLimit;
+
+    private String mNextPage;
 
     private static final Uri LOCATION_BASE_URL =
             Uri.parse(LifeLog.API_BASE_URL).buildUpon().appendEncodedPath("users/me/locations").build();
@@ -102,6 +105,20 @@ public class MeLocationRequest {
                               JSONArray resultArray = jsonObject.getJSONArray("result");
                               for (int i = 0; i < resultArray.length(); i++) {
                                   locations.add(new MeLocation(resultArray.getJSONObject(i)));
+                              }
+
+                              JSONArray links = jsonObject.optJSONArray("links");
+                              if (links != null) {
+                                  for (int i = 0; i < links.length(); i++) {
+                                      JSONObject object = links.getJSONObject(i);
+                                      if (TextUtils.equals("next", object.optString("rel"))) {
+                                          String href = object.optString("href");
+                                          if (!TextUtils.isEmpty(href) && URLUtil
+                                                  .isNetworkUrl(href)) {
+                                              mNextPage = href;
+                                          }
+                                      }
+                                  }
                               }
 
                               olf.onLocationFetched(locations);
