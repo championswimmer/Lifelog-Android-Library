@@ -67,8 +67,6 @@ public class MeLocationRequest {
     }
 
     private void callLocationApi(final Context appContext, final OnLocationFetched olf) {
-        final ArrayList<MeLocation> locations = new ArrayList<>(mLimit);
-
         Uri.Builder uriBuilder = LOCATION_BASE_URL.buildUpon();
         if (!TextUtils.isEmpty(mStartTime)) {
             uriBuilder.appendQueryParameter("start_time", mStartTime);
@@ -80,39 +78,51 @@ public class MeLocationRequest {
             uriBuilder.appendQueryParameter("limit", String.valueOf(mLimit));
         }
 
-        final JsonObjectRequest locationRequest = new AuthedJsonObjectRequest(appContext,
-                Request.Method.GET, uriBuilder.toString(), (JSONObject) null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject jsonObject) {
-                        if (Debug.isDebuggable(appContext)) {
-                            Log.v(TAG, jsonObject.toString());
-                        }
-                        try {
-                            JSONArray resultArray = jsonObject.getJSONArray("result");
-                            for (int i = 0; i < resultArray.length(); i++) {
-                                locations.add(new MeLocation(resultArray.getJSONObject(i)));
-                            }
-                            olf.onLocationFetched(locations);
-                        } catch (JSONException e) {
-                            if (Debug.isDebuggable(appContext)) {
-                                Log.w(TAG, "JSONException", e);
-                            }
-                        }
-
-
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        if (Debug.isDebuggable(appContext)) {
-                            Log.w(TAG, "VolleyError: " + new String(volleyError.networkResponse.data), volleyError);
-                        }
-                    }
-                }
-        );
+        final JsonObjectRequest locationRequest =
+                new LocationApiRequest(appContext, uriBuilder.toString(), olf);
         VolleySingleton.getInstance(appContext).addToRequestQueue(locationRequest);
+    }
+
+    private class LocationApiRequest extends AuthedJsonObjectRequest {
+        private LocationApiRequest(final Context context,
+                                   final String url,
+                                   final OnLocationFetched olf) {
+            super(context,
+                  Request.Method.GET,
+                  url,
+                  (JSONObject) null,
+                  new Response.Listener<JSONObject>() {
+                      @Override
+                      public void onResponse(JSONObject jsonObject) {
+                          ArrayList<MeLocation> locations = new ArrayList<>(mLimit);
+                          if (Debug.isDebuggable(context)) {
+                              Log.v(TAG, jsonObject.toString());
+                          }
+                          try {
+                              JSONArray resultArray = jsonObject.getJSONArray("result");
+                              for (int i = 0; i < resultArray.length(); i++) {
+                                  locations.add(new MeLocation(resultArray.getJSONObject(i)));
+                              }
+
+                              olf.onLocationFetched(locations);
+                          } catch (JSONException e) {
+                              if (Debug.isDebuggable(context)) {
+                                  Log.w(TAG, "JSONException", e);
+                              }
+                          }
+
+
+                      }
+                  },
+                  new Response.ErrorListener() {
+                      @Override
+                      public void onErrorResponse(VolleyError volleyError) {
+                          if (Debug.isDebuggable(context)) {
+                              Log.w(TAG, "VolleyError: " + new String(volleyError.networkResponse.data), volleyError);
+                          }
+                      }
+                  });
+        }
     }
 
     public interface OnLocationFetched {
