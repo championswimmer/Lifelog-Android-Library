@@ -2,6 +2,8 @@ package com.sonymobile.lifelog.api.requests;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.URLUtil;
@@ -32,6 +34,7 @@ public class MeLocationRequest {
     private String mStartTime, mEndTime;
     private Integer mLimit;
 
+    @Nullable
     private String mNextPage;
 
     private static final Uri LOCATION_BASE_URL =
@@ -127,8 +130,6 @@ public class MeLocationRequest {
                                   Log.w(TAG, "JSONException", e);
                               }
                           }
-
-
                       }
                   },
                   new Response.ErrorListener() {
@@ -140,6 +141,28 @@ public class MeLocationRequest {
                       }
                   });
         }
+    }
+
+    /**
+     * Dispatch call of the location API for next page, if the next page is available for previous
+     * call of {@link #get(Context, OnLocationFetched)}.
+     *
+     * @return true, if next page is available
+     */
+    public boolean getNextPage(@NonNull final Context context, @NonNull final OnLocationFetched olf) {
+        if (mNextPage == null) {
+            return false;
+        }
+        Context appContext = context.getApplicationContext();
+
+        if (Debug.isDebuggable(appContext)) {
+            Log.v(TAG, "getNextPage called");
+        }
+        final JsonObjectRequest locationRequest =
+                new LocationApiRequest(appContext, mNextPage, olf);
+        mNextPage = null;
+        VolleySingleton.getInstance(appContext).addToRequestQueue(locationRequest);
+        return true;
     }
 
     public interface OnLocationFetched {
