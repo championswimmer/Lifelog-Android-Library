@@ -136,7 +136,12 @@ public class MeLocationRequest {
                       @Override
                       public void onErrorResponse(VolleyError volleyError) {
                           if (Debug.isDebuggable(context)) {
-                              Log.w(TAG, "VolleyError: " + new String(volleyError.networkResponse.data), volleyError);
+                              if (volleyError.networkResponse != null) {
+                                  Log.w(TAG, "VolleyError: "
+                                          + new String(volleyError.networkResponse.data), volleyError);
+                              } else {
+                                  Log.w(TAG, volleyError);
+                              }
                           }
                       }
                   });
