@@ -2,8 +2,11 @@ package com.sonymobile.lifelog.api.requests;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
+import android.webkit.URLUtil;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -21,6 +24,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * Created by championswimmer on 21/4/15.
@@ -28,16 +32,19 @@ import java.util.Calendar;
 public class MeLocationRequest {
 
     private static final String TAG = "LifeLog:LocationAPI";
-    private String startTime, endTime;
-    private Integer limit;
+    private String mStartTime, mEndTime;
+    private Integer mLimit;
+
+    @Nullable
+    private String mNextPage;
 
     private static final Uri LOCATION_BASE_URL =
             Uri.parse(LifeLog.API_BASE_URL).buildUpon().appendEncodedPath("users/me/locations").build();
 
     public MeLocationRequest(Calendar start, Calendar end, Integer lim) {
-        if (start != null) startTime = ISO8601Date.fromCalendar(start);
-        if (end != null) endTime = ISO8601Date.fromCalendar(end);
-        limit = lim;
+        if (start != null) mStartTime = ISO8601Date.fromCalendar(start);
+        if (end != null) mEndTime = ISO8601Date.fromCalendar(end);
+        mLimit = lim;
     }
 
     public static MeLocationRequest prepareRequest(Calendar start, Calendar end, Integer lim) {
@@ -67,56 +74,105 @@ public class MeLocationRequest {
     }
 
     private void callLocationApi(final Context appContext, final OnLocationFetched olf) {
-        final ArrayList<MeLocation> locations = new ArrayList<>(limit);
-
         Uri.Builder uriBuilder = LOCATION_BASE_URL.buildUpon();
-        if (!TextUtils.isEmpty(startTime)) {
-            uriBuilder.appendQueryParameter("start_time", startTime);
+        if (!TextUtils.isEmpty(mStartTime)) {
+            uriBuilder.appendQueryParameter("start_time", mStartTime);
         }
-        if (!TextUtils.isEmpty(endTime)) {
-            uriBuilder.appendQueryParameter("end_time", endTime);
+        if (!TextUtils.isEmpty(mEndTime)) {
+            uriBuilder.appendQueryParameter("end_time", mEndTime);
         }
-        if (limit > 0) {
-            uriBuilder.appendQueryParameter("limit", String.valueOf(limit));
+        if (mLimit > 0) {
+            uriBuilder.appendQueryParameter("limit", String.valueOf(mLimit));
         }
 
-        final JsonObjectRequest locationRequest = new AuthedJsonObjectRequest(appContext,
-                Request.Method.GET, uriBuilder.toString(), (JSONObject) null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject jsonObject) {
-                        if (Debug.isDebuggable(appContext)) {
-                            Log.v(TAG, jsonObject.toString());
-                        }
-                        try {
-                            JSONArray resultArray = jsonObject.getJSONArray("result");
-                            for (int i = 0; i < resultArray.length(); i++) {
-                                locations.add(new MeLocation(resultArray.getJSONObject(i)));
-                            }
-                            olf.onLocationFetched(locations);
-                        } catch (JSONException e) {
-                            if (Debug.isDebuggable(appContext)) {
-                                Log.w(TAG, "JSONException", e);
-                            }
-                        }
-
-
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        if (Debug.isDebuggable(appContext)) {
-                            Log.w(TAG, "VolleyError: " + new String(volleyError.networkResponse.data), volleyError);
-                        }
-                    }
-                }
-        );
+        final JsonObjectRequest locationRequest =
+                new LocationApiRequest(appContext, uriBuilder.toString(), olf);
         VolleySingleton.getInstance(appContext).addToRequestQueue(locationRequest);
     }
 
+    private class LocationApiRequest extends AuthedJsonObjectRequest {
+        private LocationApiRequest(final Context context,
+                                   final String url,
+                                   final OnLocationFetched olf) {
+            super(context,
+                  Request.Method.GET,
+                  url,
+                  (JSONObject) null,
+                  new Response.Listener<JSONObject>() {
+                      @Override
+                      public void onResponse(JSONObject jsonObject) {
+                          ArrayList<MeLocation> locations = new ArrayList<>(mLimit);
+                          if (Debug.isDebuggable(context)) {
+                              Log.v(TAG, jsonObject.toString());
+                          }
+                          try {
+                              JSONArray resultArray = jsonObject.getJSONArray("result");
+                              for (int i = 0; i < resultArray.length(); i++) {
+                                  locations.add(new MeLocation(resultArray.getJSONObject(i)));
+                              }
+
+                              JSONArray links = jsonObject.optJSONArray("links");
+                              if (links != null) {
+                                  for (int i = 0; i < links.length(); i++) {
+                                      JSONObject object = links.getJSONObject(i);
+                                      if (TextUtils.equals("next", object.optString("rel"))) {
+                                          String href = object.optString("href");
+                                          if (!TextUtils.isEmpty(href) && URLUtil
+                                                  .isNetworkUrl(href)) {
+                                              mNextPage = href;
+                                          }
+                                      }
+                                  }
+                              }
+
+                              olf.onLocationFetched(locations);
+                          } catch (JSONException e) {
+                              if (Debug.isDebuggable(context)) {
+                                  Log.w(TAG, "JSONException", e);
+                              }
+                          }
+                      }
+                  },
+                  new Response.ErrorListener() {
+                      @Override
+                      public void onErrorResponse(VolleyError volleyError) {
+                          if (Debug.isDebuggable(context)) {
+                              if (volleyError.networkResponse != null) {
+                                  Log.w(TAG, "VolleyError: "
+                                          + new String(volleyError.networkResponse.data), volleyError);
+                              } else {
+                                  Log.w(TAG, volleyError);
+                              }
+                          }
+                      }
+                  });
+        }
+    }
+
+    /**
+     * Dispatch call of the location API for next page, if the next page is available for previous
+     * call of {@link #get(Context, OnLocationFetched)} by pagination feature of the Lifelog API.
+     *
+     * @return true, if next page of pagination is available
+     */
+    public boolean getNextPage(@NonNull final Context context, @NonNull final OnLocationFetched olf) {
+        if (mNextPage == null) {
+            return false;
+        }
+        Context appContext = context.getApplicationContext();
+
+        if (Debug.isDebuggable(appContext)) {
+            Log.v(TAG, "getNextPage called");
+        }
+        final JsonObjectRequest locationRequest =
+                new LocationApiRequest(appContext, mNextPage, olf);
+        mNextPage = null;
+        VolleySingleton.getInstance(appContext).addToRequestQueue(locationRequest);
+        return true;
+    }
+
     public interface OnLocationFetched {
-        void onLocationFetched(ArrayList<MeLocation> locations);
+        void onLocationFetched(List<MeLocation> locations);
     }
 
 }
