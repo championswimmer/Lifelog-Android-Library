@@ -150,9 +150,9 @@ public class MeLocationRequest {
 
     /**
      * Dispatch call of the location API for next page, if the next page is available for previous
-     * call of {@link #get(Context, OnLocationFetched)}.
+     * call of {@link #get(Context, OnLocationFetched)} by pagination feature of the Lifelog API.
      *
-     * @return true, if next page is available
+     * @return true, if next page of pagination is available
      */
     public boolean getNextPage(@NonNull final Context context, @NonNull final OnLocationFetched olf) {
         if (mNextPage == null) {
