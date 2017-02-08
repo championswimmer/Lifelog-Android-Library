@@ -55,11 +55,26 @@ public class MainActivity extends ActionBarActivity {
                     logout.setVisibility(View.VISIBLE);
                     login.setVisibility(View.GONE);
                     Toast.makeText(MainActivity.this, "authed", Toast.LENGTH_SHORT).show();
-                    MeLocationRequest llLocation = MeLocationRequest.prepareRequest(500);
+                    final MeLocationRequest llLocation = MeLocationRequest.prepareRequest(500);
                     llLocation.get(MainActivity.this, new MeLocationRequest.OnLocationFetched() {
+
+                        private int mPage = 0;
+
                         @Override
                         public void onLocationFetched(ArrayList<MeLocation> locations) {
-                            Log.d(TAG, locations.get(0).getId());
+                            Log.d(TAG, "Page number: " + mPage + ", " + locations.size() + " points of location data fetched.");
+
+                            if (mPage >= 9) {
+                                Log.d(TAG, "10 pages of data fetched, finish fetching.");
+                                return;
+                            }
+
+                            if (llLocation.getNextPage(MainActivity.this, this)) {
+                                mPage++;
+                                Log.d(TAG, "Next page of pagination is available, requested the next page data");
+                            } else {
+                                Log.d(TAG, "Fetching finished until last page");
+                            }
 
                         }
                     });
