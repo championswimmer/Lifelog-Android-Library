@@ -24,6 +24,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * Created by championswimmer on 21/4/15.
@@ -171,7 +172,7 @@ public class MeLocationRequest {
     }
 
     public interface OnLocationFetched {
-        void onLocationFetched(ArrayList<MeLocation> locations);
+        void onLocationFetched(List<MeLocation> locations);
     }
 
 }

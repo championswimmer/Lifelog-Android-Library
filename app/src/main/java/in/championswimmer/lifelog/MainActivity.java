@@ -18,7 +18,7 @@ import com.sonymobile.lifelog.api.requests.MeLocationRequest;
 import com.sonymobile.lifelog.api.requests.MeRequest;
 import com.sonymobile.lifelog.utils.SecurePreferences;
 
-import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -61,7 +61,7 @@ public class MainActivity extends ActionBarActivity {
                         private int mPage = 0;
 
                         @Override
-                        public void onLocationFetched(ArrayList<MeLocation> locations) {
+                        public void onLocationFetched(List<MeLocation> locations) {
                             Log.d(TAG, "Page number: " + mPage + ", " + locations.size() + " points of location data fetched.");
 
                             if (mPage >= 9) {
