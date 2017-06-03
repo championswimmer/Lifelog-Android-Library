@@ -27,8 +27,11 @@ public final class ISO8601Date {
      */
     public static String fromCalendar(final Calendar calendar) {
         Date date = calendar.getTime();
-        FROM_CALENDAR_FORMATTER.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return FROM_CALENDAR_FORMATTER.format(date);
+
+        synchronized (FROM_CALENDAR_FORMATTER) {
+            FROM_CALENDAR_FORMATTER.setTimeZone(TimeZone.getTimeZone("UTC"));
+            return FROM_CALENDAR_FORMATTER.format(date);
+        }
     }
 
     /**
@@ -52,7 +55,10 @@ public final class ISO8601Date {
         int lastIndex = s.lastIndexOf(":");
         s = s.substring(0, lastIndex) + s.substring(lastIndex + 1);
 
-        Date date = TO_CALENDAR_FORMATTER.parse(s);
+        Date date;
+        synchronized (TO_CALENDAR_FORMATTER) {
+            date = TO_CALENDAR_FORMATTER.parse(s);
+        }
 
         // TODO Because Date class of Java does not handle timezone, timezone information
         // in calendar is incorrect and system default is used regardless of original String.
